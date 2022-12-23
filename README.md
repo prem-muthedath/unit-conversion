@@ -1,3 +1,3 @@
-Haskell implementation of simple (linear & prportional) unit conversions.
+Haskell implementation of simple (linear & proportional) unit conversions.
 
 author: Prem Muthedath

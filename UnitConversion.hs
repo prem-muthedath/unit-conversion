@@ -23,7 +23,17 @@
 --    on the other hand, if no conversion exists, you will see "Nothing."
 -- 3. Note that the units you specify at the GHCi commandline must correspond 
 --    EXACTLY to the ones defined in `Unit`; otherwise, you will get an error.
-
+-- 4. `convertUnitIO` does the same thing as (1) but prints out the results in a 
+--    user-friendly format. for example, you can enter the below command 
+--    (without the backticks) at GHCi prompt:
+--
+--        `convertUnitIO (25.0, Meters, Yards)`
+--
+-- 5. finally, if instead of (1), you opt to run the tests, you can do so by 
+--    entering the below command (without the backticks) at the GHCi prompt:
+--
+--        `runTests`
+--
 --------------------------------------------------------------------------------
 import qualified Data.Map as M1
 import Data.List (sortBy)
@@ -59,7 +69,7 @@ factors = [ (Meters, 3.28084, Feet),
             (Kilograms, 2.20462, Pounds) ]
 
 --------------------------------------------------------------------------------
--- | graph of factors, reprsented using a Map.
+-- | graph of factors, represented using a Map.
 --    1. Each `unit` in `factors` represents a `key` in the Map, and each such 
 --       key represents a node in the factor graph.
 --    2. each unit (i.e., key) can be "DIRECTLY" converted to one or more units, 
@@ -121,7 +131,7 @@ goodFactors = let sorted = sortBy f factors
 
 --------------------------------------------------------------------------------
 -- | converts given value from one unit to another and returns the result.
--- as ooposed to factors`, which only defines 'DIRECT' conversions between 2 
+-- as opposed to factors`, which only defines 'DIRECT' conversions between 2 
 -- units, `convertUnit` function traverses the factor graph to convert between 
 -- any 2 units, as long as such a conversion is possible, INDIRECTLY or 
 -- DIRECTLY.  if no possible conversion can be done, it returns `Nothing`. 
