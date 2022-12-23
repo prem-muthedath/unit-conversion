@@ -13,26 +13,32 @@
 -- Jane Street implementation is in python.
 --
 -- HOW TO RUN:
--- 1. load this file in GHCi.  then call `convertUnit` function at the prompt.  
---    for example, to convert 25 meters to yards, you can type the below command 
---    (without the backticks) at the GHCi prompt and press ENTER:
+-- 1. load this file in GHCi.
+-- 2. then call `convertUnit` function at the prompt.  for example, to convert 
+--    25 meters to yards, you can type the below command (without the backticks) 
+--    at the GHCi prompt and press ENTER:
 --
 --        `convertUnit (25.0, Meters, Yards)`
 --
--- 2. if a conversion is possible, you will see the result at the GHCi prompt.  
+-- 3. if a conversion is possible, you will see the result at the GHCi prompt.  
 --    on the other hand, if no conversion exists, you will see "Nothing."
--- 3. Note that the units you specify at the GHCi commandline must correspond 
+-- 4. Note that the units you specify at the GHCi commandline must correspond 
 --    EXACTLY to the ones defined in `Unit`; otherwise, you will get an error.
--- 4. `convertUnitIO` does the same thing as (1) but prints out the results in a 
+-- 5. `convertUnitIO` does the same thing as (2) but prints out the results in a 
 --    user-friendly format. for example, you can enter the below command 
 --    (without the backticks) at GHCi prompt:
 --
 --        `convertUnitIO (25.0, Meters, Yards)`
 --
--- 5. finally, if instead of (1), you opt to run the tests, you can do so by 
+-- 6. finally, if instead of (2), you opt to run the tests, you can do so by 
 --    entering the below command (without the backticks) at the GHCi prompt:
 --
 --        `runTests`
+--
+--    the test run will output both results from running `convertUnitIO` on all 
+--    test cases as well as a comparision of actual, expected, and actual vs 
+--    expected comparision for each of the test cases.  if actual and expected 
+--    agree within allowable tolerance, you see "True`; otherwise, "False."
 --
 --------------------------------------------------------------------------------
 import qualified Data.Map as M1
@@ -235,9 +241,9 @@ runTests = do
 
   -- mapM_ :: (Foldable t, Monad m) => (a -> m b) -> t a -> m ()
   -- zipWith3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
-  putStrLn "******************* RESULTS **********************"
+  putStrLn "***************** RESULTS (input = output) **********************"
   mapM_ convertUnitIO cases   -- print just the results in user friendly format
-  putStrLn "\n **** (result, expected, result vs expected) ****"
+  putStrLn "\n **** (actual, expected, actual vs expected) ****"
   mapM_ print $ zipWith3 (\a b c -> (a, b, c)) res exp chk  -- print all
 
 --------------------------------------------------------------------------------
