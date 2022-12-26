@@ -145,12 +145,12 @@ goodFactors = let sorted = sortBy f factors
 -- some type synonyms for readability:
 type Value = Double; type Marked = Unit
 
-convertUnit :: (Value, From, To) -> Maybe Double
+convertUnit :: (Value, From, To) -> Maybe Value
 convertUnit (val, from, to)
       -- M1.notMember :: Ord k => k -> M1.Map k a -> Bool
       | M1.notMember from factorGraph = Nothing
       | otherwise                     = convert' [] [(from, val)]
-      where convert' :: [Marked] -> [(Unit, Value)] -> Maybe Double
+      where convert' :: [Marked] -> [(Unit, Value)] -> Maybe Value
             convert' marked [] = Nothing
             convert' marked ((u1, v1) : xs)
               -- M1.notMember :: Ord k => k -> M1.Map k a -> Bool
@@ -235,15 +235,17 @@ runTests = do
       res = map (\(x, y, z) -> convertUnit (x, y, z)) cases   -- results
       -- zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
       chk = zipWith (\x y -> case (x, y) of  -- check results vs expected
-                              (Just a, Just b)    -> abs (a - b) <= 0.0001
-                              (Nothing, Nothing)  -> True
-                              (_, _)              -> False) res exp
+                              (Just a, Just b)    -> if abs (a - b) <= 0.0001
+                                                        then "PASS"
+                                                        else "FAIL"
+                              (Nothing, Nothing)  -> "PASS"
+                              (_, _)              -> "FAIL") res exp
 
   -- mapM_ :: (Foldable t, Monad m) => (a -> m b) -> t a -> m ()
   -- zipWith3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
   putStrLn "***************** RESULTS (input = output) **********************"
   mapM_ convertUnitIO cases   -- print just the results in user friendly format
-  putStrLn "\n **** (actual, expected, actual vs expected) ****"
+  putStrLn "\n **** (actual, expected, pass/fail) ****"
   mapM_ print $ zipWith3 (\a b c -> (a, b, c)) res exp chk  -- print all
 
 --------------------------------------------------------------------------------
