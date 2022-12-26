@@ -38,7 +38,7 @@
 --    the test run will output both results from running `convertUnitIO` on all 
 --    test cases as well as a comparision of actual, expected, and actual vs 
 --    expected comparision for each of the test cases.  if actual and expected 
---    agree within allowable tolerance, you see "True`; otherwise, "False."
+--    agree within allowable tolerance, you see "PASS`; otherwise, "FAIL."
 --
 --------------------------------------------------------------------------------
 import qualified Data.Map as M1
@@ -64,6 +64,8 @@ type Factor = Double; type From = Unit; type To = Unit
 
 --------------------------------------------------------------------------------
 -- | specifies conversion factors from `from` units to `to` units.
+-- NOTE: `factors` should /= [] & should have no duplicates; duplicates here 
+-- means that no 2 elements should have the same `from` and `to` units.
 factors :: [(From, Factor, To)]
 factors = [ (Meters, 3.28084, Feet),
             (Feet, 12.0, Inches),
@@ -114,21 +116,24 @@ factorGraph = ($ []) <$> M1.fromListWith (.) [(k, (v:)) | (k, v) <- edges]
         --     feet-to-meters conversion.
         --  2.`edges` code follows /u/ chi @ https://tinyurl.com/ynvc66f3 (so)
         --  3. to ensure we have a valid graph, `edges` uses `goodFactors`, 
-        --     instead of directly using `factors`. if `factors` has no 
+        --     instead of directly using `factors`. if `factors` /= [] & has no 
         --     duplicates, `goodFactors` returns `factors`; else it errors.
         edges = [y | (u1, f, u2) <- goodFactors, y <- [edge u1 f u2, edge u2 (1.0/f) u1]]
         edge :: From -> Factor -> To -> (From, (To, Factor))
         edge = \u1 f u2 -> (u1, (u2, f))
 
 --------------------------------------------------------------------------------
--- | checks `factors`, returning it if it has 0 duplicates; else, throws error.
+-- | checks `factors`, returning it if /= [] & has 0 duplicates; else, errors.
 goodFactors :: [(From, Factor, To)]
 -- sortBy :: (a -> a -> Ordering) -> [a] -> [a]
 -- zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
 -- duplicates check code from /u/ dfeuer (so) @ https://tinyurl.com/bdcspyhv
-goodFactors = let sorted = sortBy f factors
-                  noDups = and $ zipWith g sorted (drop 1 sorted)
-              in if noDups then factors else error "`factors` contains duplicates"
+goodFactors | factors == [] = error "`factors` has no factors."
+            | otherwise     = let sorted = sortBy f factors
+                                  noDups = and $ zipWith g sorted (drop 1 sorted)
+                              in if noDups
+                                    then factors
+                                    else error "`factors` contains duplicates"
   where f :: (From, Factor, To) -> (From, Factor, To) -> Ordering
         -- compare :: Ord a => a -> a -> Ordering
         f = \(a, _, b) (c, _, d) -> if (compare a c) == EQ then (compare b d) else compare a c
