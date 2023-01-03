@@ -67,11 +67,13 @@ type Factor = Double; type From = Unit; type To = Unit
 -- NOTE: `factors` should /= [] & should have no duplicates; duplicates here 
 -- means that no 2 elements should have the same `from` and `to` units.
 factors :: [(From, Factor, To)]
-factors = [ (Meters, 3.28084, Feet),
+factors = [ -- length factors
+            (Meters, 3.28084, Feet),
             (Feet, 12.0, Inches),
             (Feet, 0.333333, Yards),
             (Inches, 25.4, Millimeters),
             (Meters, 100.0, Centimeters),
+            -- weight factors
             (Stone, 14.0, Pounds),
             (Kilograms, 1000.0, Grams),
             (Kilograms, 2.20462, Pounds) ]
@@ -177,7 +179,7 @@ convertUnitIO (val, from, to) = case (convertUnit (val, from, to)) of
                                     Just x    ->  printResult $ show x
   where printResult :: String -> IO ()
         printResult res = putStrLn $
-          show val ++ " " ++ show from ++ " = " ++ res ++ " " ++ show to
+          show val ++ " " ++ show from ++ " => " ++ res ++ " " ++ show to
 
 --------------------------------------------------------------------------------
 -- | *********************** test code follows *******************************
@@ -248,7 +250,7 @@ runTests = do
 
   -- mapM_ :: (Foldable t, Monad m) => (a -> m b) -> t a -> m ()
   -- zipWith3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
-  putStrLn "***************** RESULTS (input = output) **********************"
+  putStrLn "***************** RESULTS (input => output) **********************"
   mapM_ convertUnitIO cases   -- print just the results in user friendly format
   putStrLn "\n **** (actual, expected, pass/fail) ****"
   mapM_ print $ zipWith3 (\a b c -> (a, b, c)) res exp chk  -- print all
