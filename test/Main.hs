@@ -87,14 +87,13 @@ runTests =
           mapM_ convertUnitIO tcs'   -- print just the results in user friendly format
         printActualVsExpected :: [(Value, From, To)] -> [(Maybe Value)] -> IO ()
         printActualVsExpected tcs' exps' =
-          let acts = map (\(x, y, z) -> convertUnit (x, y, z)) tcs' -- actuals
-              tol  = 0.0001 :: Double   -- tolerance
-              chks = zipWith (\x y -> case (x, y) of  -- check actual vs expected
-                        (Just a, Just b)    -> if abs (a - b) <= tol
-                                                  then "PASS"
-                                                  else "FAIL"
-                        (Nothing, Nothing)  -> "PASS"
-                        (_, _)              -> "FAIL") acts exps'
+          let acts = map convertUnit tcs'   -- actuals
+              chks = zipWith f acts exps'   -- check actual vs expected
+              f :: Maybe Value -> Maybe Value -> String
+              f (Just a) (Just b) = if abs (a - b) <= tol then "PASS" else "FAIL"
+              f Nothing Nothing   = "PASS"
+              f _ _               = "FAIL"
+              tol  = 0.0001 :: Double       -- tolerance
           in do putStrLn "\n **** (actual, expected, pass/fail) ****"
                 mapM_ print $ zipWith3 (\a b c -> (a, b, c)) acts exps' chks
 --------------------------------------------------------------------------------
