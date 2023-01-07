@@ -13,7 +13,7 @@ scope:
   - does not handle stuff such as unit conversion of areas, volumes, as well as 
     celsius-to-fahrenheit conversion, or conversion of units related through 
     complex formula or mathematical equations.
-  - conversions at this time are limited to those between units defined in the 
+  - conversions at this time limited to those between units defined in the 
     `Unit` data type.
 
 GHC version: 8.10.4, cabal 3.40
