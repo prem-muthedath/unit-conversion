@@ -112,7 +112,10 @@ factorGraph = ($ []) <$> M1.fromListWith (.) [(k, (v:)) | (k, v) <- edges]
 -- as opposed to factors`, which only defines 'DIRECT' conversions between 2 
 -- units, `convertUnit` function traverses the factor graph (BFS algorithm) to 
 -- convert between any 2 units, as long as such a conversion is possible, 
--- INDIRECTLY or DIRECTLY.  if no such conversion exists, it returns `Nothing`. 
+-- INDIRECTLY or DIRECTLY.  if no such conversion exists, it returns `Nothing`.
+--
+-- for a similiar implementation & graph representation as the one i have done 
+-- here, checkout https://ksvi.mff.cuni.cz/~dingle/2020-1/npp/notes_12.html
 --
 -- some type synonyms for readability:
 type Value = Double; type Marked = Unit
