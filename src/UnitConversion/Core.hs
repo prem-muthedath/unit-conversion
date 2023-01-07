@@ -114,8 +114,8 @@ factorGraph = ($ []) <$> M1.fromListWith (.) [(k, (v:)) | (k, v) <- edges]
 -- convert between any 2 units, as long as such a conversion is possible, 
 -- INDIRECTLY or DIRECTLY.  if no such conversion exists, it returns `Nothing`.
 --
--- for a similiar implementation & graph representation as the one i have done 
--- here, checkout https://ksvi.mff.cuni.cz/~dingle/2020-1/npp/notes_12.html
+-- for a similar BFS implementation & graph representation as the one i have 
+-- done here, checkout https://ksvi.mff.cuni.cz/~dingle/2020-1/npp/notes_12.html
 --
 -- some type synonyms for readability:
 type Value = Double; type Marked = Unit
