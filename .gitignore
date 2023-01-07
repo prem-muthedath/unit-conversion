@@ -1,0 +1,3 @@
+# include everything but these:
+/dist-newstyle
+
