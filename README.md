@@ -2,6 +2,9 @@
 
 simple (linear & proportional) unit conversions.
 
+inspired by Jane Street python implementation of a similiar problem @   
+https://www.youtube.com/watch?v=VfbFJISCP3g.
+
 author: Prem Muthedath
 
 scope:
@@ -13,13 +16,9 @@ scope:
   - conversions at this time are limited to those between units defined in the 
     `Unit` data type.
 
-REF:
-  1. Jane Street python implementation of a similiar problem @
-     https://www.youtube.com/watch?v=VfbFJISCP3g.
-
 GHC version: 8.10.4, cabal 3.40
 
-HOW TO RUN THE PROGRAM AND TESTS:
+how to use the library & run the tests:
   1. `cd` to `unit-conversion`, the top directory containing this `README` file, 
      and remain there to execute any of the steps below.
   2. to load the `UnitConversion` library into `GHCi`, enter the below command 
