@@ -9,17 +9,27 @@
 --  3. https://tinyurl.com/2s4h9vth (cs.auckland.nz, #if, #ifdef, #endif)
 --  4. https://tinyurl.com/33wmdvzd (/u/ willen van onsem, so) (CPP indentation)
 module UnitConversion
-  ( Unit (..)
+  (
+  -- available units specified by `Unit` data type
+    Unit (..)
+  -- value specified for conversion, a synonym for `Double`
   , Value
+  -- the  "from" `Unit` you want to convert from.
   , From
+  -- the "to" `Unit` you want to convert to
   , To
+  -- the conversion factor specified between the `From` and `To` units
   , Factor
+  -- all available conversion factors in this package
   , factors
+  -- converts a `Value` from `From` to `To`
   , convertUnit
   -- for GHCi (interactive) usage, mainly
+  -- does the same thing as `convertUnit` but also formats and prints the result
   , convertUnitIO
   -- exposed only for testing internal functions
 #ifdef TESTING
+  -- graph of `factors`
   , factorGraph
 #endif
   ) where
