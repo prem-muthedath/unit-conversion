@@ -1,10 +1,10 @@
 #### unit-conversion
 
-Simple (linear & proportional) unit conversions.
+simple (linear & proportional) unit conversions.
 
-Author: Prem Muthedath
+author: Prem Muthedath
 
-Scope:
+scope:
   - converts between units that are in direct linear proportional relationship, 
     such as meters-to-feet, kilograms-to-grams, etc.
   - does not handle stuff such as unit conversion of areas, volumes, as well as 
@@ -22,8 +22,8 @@ GHC version: 8.10.4, cabal 3.40
 HOW TO RUN THE PROGRAM AND TESTS:
   1. `cd` to `unit-conversion`, the top directory containing this `README` file, 
      and remain there to execute any of the steps below.
-  2. to load the `UnitConversion` library into `GHCi`, type the below command at 
-     the commandline & press `ENTER`:
+  2. to load the `UnitConversion` library into `GHCi`, enter the below command 
+     at the commandline:
 
         - `cabal v2-repl :unit-conversion`
 
@@ -34,7 +34,7 @@ HOW TO RUN THE PROGRAM AND TESTS:
         - `convertUnitIO (25.0, Meters, Yards)`
 
      if no possible conversion exists between the units you have specified, you 
-     will likely see `Nothing` as the result.
+     will see `Nothing` as the result.
   3. if you wish to run the tests on the unix commandline, you can do so by 
      running the below command (NOTE: if you are in `GHCi`, first exit from 
      there):
