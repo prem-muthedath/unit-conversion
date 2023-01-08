@@ -8,13 +8,13 @@ https://www.youtube.com/watch?v=VfbFJISCP3g.
 author: Prem Muthedath
 
 scope:
-  - converts units that are in direct linear proportional relationship: 
-    meters-to-feet, pounds-to-grams, etc.
+  - converts values from one unit to another.
+  - unit conversions limited to units in direct linear proportional 
+    relationship: meters-to-feet, pounds-to-grams, etc.
+  - conversions limited to units defined in the `Unit` data type.
   - does not handle stuff such as unit conversion of areas, volumes, as well as 
     celsius-to-fahrenheit conversion, or conversion of units related through 
     complex formulae or mathematical equations.
-  - conversions at this time limited to those between units defined in the 
-    `Unit` data type.
 
 GHC version: 8.10.4, cabal 3.40
 
