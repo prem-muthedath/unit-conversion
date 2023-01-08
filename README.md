@@ -8,11 +8,11 @@ https://www.youtube.com/watch?v=VfbFJISCP3g.
 author: Prem Muthedath
 
 scope:
-  - converts between units that are in direct linear proportional relationship, 
-    such as meters-to-feet, kilograms-to-grams, etc.
+  - converts units that are in direct linear proportional relationship, such as 
+    meters-to-feet, pounds-to-grams, etc.
   - does not handle stuff such as unit conversion of areas, volumes, as well as 
     celsius-to-fahrenheit conversion, or conversion of units related through 
-    complex formula or mathematical equations.
+    complex formulae or mathematical equations.
   - conversions at this time limited to those between units defined in the 
     `Unit` data type.
 
