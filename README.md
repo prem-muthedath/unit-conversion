@@ -9,8 +9,8 @@ author: Prem Muthedath
 
 scope:
   - converts values from one unit to another.
-  - unit conversions limited to units in direct linear proportional 
-    relationship: meters-to-feet, pounds-to-grams, etc.
+  - conversions limited to units in direct linear proportional relationship: 
+    meters-to-feet, pounds-to-grams, etc.
   - conversions limited to units defined in the `Unit` data type.
   - does not handle stuff such as unit conversion of areas, volumes, as well as 
     celsius-to-fahrenheit conversion, or conversion of units related through 
