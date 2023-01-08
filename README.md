@@ -8,7 +8,7 @@ https://www.youtube.com/watch?v=VfbFJISCP3g.
 author: Prem Muthedath
 
 scope:
-  - converts units that are in direct linear proportional relationship, such as 
+  - converts units that are in direct linear proportional relationship: 
     meters-to-feet, pounds-to-grams, etc.
   - does not handle stuff such as unit conversion of areas, volumes, as well as 
     celsius-to-fahrenheit conversion, or conversion of units related through 
