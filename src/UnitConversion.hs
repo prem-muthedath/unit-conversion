@@ -12,14 +12,14 @@ module UnitConversion
   ( Unit (..)
   -- available units specified by `Unit` data type
   , Value
-  -- a `Double` number that we want to convert from one unit to another or the 
-  -- result of a conversion we have already performed.
+  -- a `Double` that we want to convert from one unit to another or the result 
+  -- of a conversion we have already performed.
   , From
   -- the  "from" `Unit` you want to convert from.
   , To
   -- the "to" `Unit` you want to convert to.
   , Factor
-  -- the conversion factor, a `Double` number, that relates `From` & `To` units.
+  -- the conversion factor, a `Double`, that relates `From` & `To` units.
   , factors
   -- all available conversion factors in this package.
   , convertUnit
