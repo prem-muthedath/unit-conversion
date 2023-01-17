@@ -244,7 +244,7 @@ prop_genNonIdentityConv = forAll genNonIdentityConv $
 unitTestsInternal :: TestTree
 unitTestsInternal = testGroup
         "unit tests -- internal test generators, functions"
-        [ generator, expFail]
+        [ generator, expFail ]
   where generator = testGroup "Unit tests of test data generators"
             [ testCase "test graph generator" test_genGoodGraph ]
         expFail = expectFail $
