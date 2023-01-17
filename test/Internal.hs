@@ -143,7 +143,7 @@ tests = testGroup " *** Tests of internal test functions, data generators ***"
 -- | ************************* QC internal tests *******************************
 --------------------------------------------------------------------------------
 qcInternal :: TestTree
-qcInternal = testGroup "QuickCheck properties -- internal functions, generators."
+qcInternal = testGroup "QuickCheck properties -- internal test functions, generators"
     [ testProperty "generator test: `genGoodFactors`" prop_genGoodFactors
     , testProperty "generator test: `genIdentityConv`" prop_genIdentityConv
     , testProperty "generator test: `genNonIdentityConv`" prop_genNonIdentityConv
@@ -239,12 +239,12 @@ unitTestsInternal = testGroup
                       "unit tests -- internal test generators, functions"
                       [generator, expFail]
   where generator = testGroup
-          "unit test of test data generators"
+          "Unit tests of test data generators"
           [ testCase "test graph generator" $
               assertBool "test graph generator bad" test_genGoodGraph
           ]
         expFail = expectFail $
-          testGroup "unit tests of expected-to-fail internal test functions"
+          testGroup "Unit tests of expected-to-fail internal test functions"
             [ testCase "`test_allFactorsGT0'`" test_allFactorsGT0'
             , testCase "`test_noDupFactors'`" test_noDupFactors'
             , testCase "`test_emptyGraph'`" test_emptyGraph'
@@ -266,7 +266,7 @@ test_genGoodGraph =
              ks = M1.keys mp
              us = [ toEnum 0 :: Unit .. ]
              ch = [ f k ((M1.!) mp k) | k <- ks, ks == us ]
-         in and ch
+         in (ch /= []) && (and ch)
     where f :: From -> [(To, Factor)] -> Bool
           f k vs | nub vs /= vs = False
                  | (map fst vs) /= filter (/= k) [ toEnum 0 :: Unit .. ] = False
