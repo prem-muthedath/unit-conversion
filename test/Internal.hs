@@ -303,7 +303,7 @@ test_nonEmptyGraph' :: Assertion
 test_nonEmptyGraph' = do nonEmptyGraph' nonEmpty
                          nonEmptyGraph' empty
   where nonEmpty = genGoodGraph
-        empty     = M1.empty
+        empty    = M1.empty
 
 -- | test `noEmptyGraphValues'`
 test_noEmptyGraphValues' :: Assertion
