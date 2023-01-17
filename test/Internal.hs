@@ -32,6 +32,10 @@ noDups :: (Ord a, Eq a)
 noDups f g xs = let sorted = sortBy f xs
                 in and $ zipWith g sorted (drop 1 sorted)
 
+-- | all units.
+units :: [Unit]
+units = [ toEnum 0 :: Unit .. ]
+
 -- | test if all factors are > 0.0
 allFactorsGT0' :: [(From, Factor, To)] -> Assertion
 allFactorsGT0' facs =
@@ -48,13 +52,11 @@ noDupFactors' facs = assertBool msg $
 -- | generate a `good` test factor graph.  this is a test mock -- a fake --
 -- graph that mimics just the basic properties of the actual factor graph.
 genGoodGraph :: M1.Map From [(To, Factor)]
-genGoodGraph = M1.fromList $ [ genGoodGraph' u | u <- us ]
-    where us :: [Unit]
-          us = [ toEnum 0 :: Unit .. ]
-          genGoodGraph' :: Unit -> (From, [(To, Factor)])
-          genGoodGraph' x = let l   = length us - 1
+genGoodGraph = M1.fromList $ [ genGoodGraph' u | u <- units ]
+    where genGoodGraph' :: Unit -> (From, [(To, Factor)])
+          genGoodGraph' x = let l   = length units - 1
                                 vs  = replicate l (1.0 :: Double)
-                            in (x, (zip  (filter (/= x) us) vs))
+                            in (x, (zip  (filter (/= x) units) vs))
 
 -- | test if given graph is empty.
 emptyGraph' :: M1.Map From [(To, Factor)] -> Assertion
@@ -155,7 +157,7 @@ qcInternal = testGroup "QuickCheck properties -- internal test functions, genera
 --------------------------------------------------------------------------------
 -- | `Arbitrary` instance for `Unit`.
 instance Arbitrary Unit where
-  arbitrary = elements $ [toEnum 0 :: Unit ..]
+  arbitrary = elements units
 
 -- | generate a random list of factors having no duplicates.
 genGoodFactors :: Gen [(From, Factor, To)]
@@ -264,12 +266,11 @@ test_genGoodGraph :: Bool
 test_genGoodGraph =
          let mp = genGoodGraph
              ks = M1.keys mp
-             us = [ toEnum 0 :: Unit .. ]
-             ch = [ f k ((M1.!) mp k) | k <- ks, ks == us ]
+             ch = [ f k ((M1.!) mp k) | k <- ks, ks == units ]
          in (ch /= []) && (and ch)
     where f :: From -> [(To, Factor)] -> Bool
           f k vs | nub vs /= vs = False
-                 | (map fst vs) /= filter (/= k) [ toEnum 0 :: Unit .. ] = False
+                 | (map fst vs) /= filter (/= k) units = False
                  | any (/= 1.0) (map snd vs) = False
                  | otherwise = True
 
