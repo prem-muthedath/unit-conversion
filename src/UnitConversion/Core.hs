@@ -38,7 +38,6 @@ data Unit = Meters
               | Grams
               | Pounds
               | Stone
-              | Wazooo    -- this is an "unreal" unit, used just for testing.
               deriving (Eq, Ord, Enum, Show)
 
 --------------------------------------------------------------------------------
@@ -123,6 +122,7 @@ type Value = Double; type Marked = Unit
 convertUnit :: (Value, From, To) -> Maybe Value
 convertUnit (val, from, to)
       -- M1.notMember :: Ord k => k -> M1.Map k a -> Bool
+      | val < 0.0                     = Nothing
       | M1.notMember from factorGraph = Nothing
       | otherwise                     = convert' [] [(from, val)]
       where convert' :: [Marked] -> [(Unit, Value)] -> Maybe Value

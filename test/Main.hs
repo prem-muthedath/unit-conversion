@@ -1,119 +1,126 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 -- | test code for unit conversion.
 -- author: Prem Muthedath
 --------------------------------------------------------------------------------
 module Main where
 --------------------------------------------------------------------------------
-import qualified Data.Map as M1
-import Data.List (sortBy)
+import Test.Tasty (defaultMain, TestTree, testGroup)
+import Test.Tasty.HUnit (testCase, assertBool)
+import Test.HUnit (Assertion)
+import Test.Tasty.QuickCheck (testProperty)
+import Test.QuickCheck
 
 import UnitConversion
+import Inputs (tcs, exps)
+import Internal
 --------------------------------------------------------------------------------
 -- | *********************** test code follows *******************************
 --------------------------------------------------------------------------------
 main :: IO ()
-main = do checkData
-          runTests
-  where checkData :: IO ()
-        checkData = do
-          putStrLn "***************** DATA CHECKS **********************"
-          let x = goodFactors
-              y = factorGraph
-          if x /= [] then putStrLn "good factors" else putStrLn "bad factors"
-          if M1.toList y /= [] then putStrLn "good graph" else putStrLn "empty graph"
+main = defaultMain Main.tests
 
--- | run some basic tests & print results, including results vs expected.
-runTests :: IO ()
-runTests =
-  let tcs =  [ -- test cases
-                (100.0, Meters, Meters),
-                (25.0, Meters, Feet),
-                (34.5, Feet, Inches),
-                (4676.28, Inches, Feet),
-                (12.0, Feet, Meters),
-                (45.56, Meters, Inches),
-                (96.0, Inches, Meters),
-                (90.0, Feet, Yards),
-                (65.52, Yards, Inches),
-                (56.0, Meters, Yards),
-                (45.0, Meters, Kilograms),
-                (90.0, Feet, Wazooo),
-                (32.89, Wazooo, Meters),
-                (10.0, Inches, Millimeters),
-                (15.0, Meters, Centimeters),
-                (9000.0, Millimeters, Meters),
-                (12.0, Feet, Centimeters),
-                (3200.0, Centimeters, Meters),
-                (700.0, Stone, Kilograms),
-                (789.0, Pounds, Grams),
-                (567.0, Pounds, Stone),
-                (15.0, Kilograms, Meters),
-                (1000.0, Grams, Kilograms),
-                (14.0, Pounds, Stone)
-             ]
-      exps = [ -- expected output
-                Just 100.0,         -- M -> M
-                Just 82.021,        -- F -> M
-                Just 414.0,         -- F -> I
-                Just 389.69,        -- I -> F
-                Just 3.65753,       -- F -> M
-                Just 1793.700844,   -- M -> I
-                Just 2.4383999,     -- I -> M
-                Just 29.99997,      -- F -> Y
-                Just 2358.7223587,  -- Y -> I
-                Just 61.2422854,    -- M -> Y
-                Nothing,            -- M -> K
-                Nothing,            -- F -> W
-                Nothing,            -- W -> M
-                Just 253.99999,     -- I -> Mill
-                Just 1500.0,        -- M -> C
-                Just 9.0,           -- Mill -> M
-                Just 365.759988,    -- F -> C
-                Just 32.00,         -- C -> M
-                Just 4445.2105124,  -- S -> K
-                Just 357884.805544, -- P -> G
-                Just 40.50,         -- P -> S
-                Nothing,            -- K -> M
-                Just 1.0,           -- G -> K
-                Just 1.0            -- P -> S
-              ]
-  in do printResults tcs
-        printActualVsExpected tcs exps
-  where -- mapM_ :: (Foldable t, Monad m) => (a -> m b) -> t a -> m ()
-        -- zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
-        -- zipWith3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
-        printResults :: [(Value, From, To)] -> IO ()
-        printResults tcs' = do
-          putStrLn "***************** RESULTS (input => output) **********************"
-          mapM_ convertUnitIO tcs'   -- print just the results in user friendly format
-        printActualVsExpected :: [(Value, From, To)] -> [(Maybe Value)] -> IO ()
-        printActualVsExpected tcs' exps' =
-          let acts = map convertUnit tcs'   -- actuals
-              chks = zipWith f acts exps'   -- check actual vs expected
-              f :: Maybe Value -> Maybe Value -> String
-              f (Just a) (Just b) = if abs (a - b) <= tol then "PASS" else "FAIL"
-              f Nothing Nothing   = "PASS"
-              f _ _               = "FAIL"
-              tol  = 0.0001 :: Double       -- tolerance
-          in do putStrLn "\n **** (actual, expected, pass/fail) ****"
-                mapM_ print $ zipWith3 (\a b c -> (a, b, c)) acts exps' chks
+-- | defines the tests.
+tests :: TestTree
+tests = testGroup "Tests" [Internal.tests, library]
+  where library = testGroup "*** Tests of `unit-conversion` library functions ***"
+                      [unitTests, qcProps]
 --------------------------------------------------------------------------------
--- | checks `factors`, returning it if /= [] & has 0 duplicates; else, errors.
-goodFactors :: [(From, Factor, To)]
--- sortBy :: (a -> a -> Ordering) -> [a] -> [a]
--- zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
--- duplicates check code from /u/ dfeuer (so) @ https://tinyurl.com/bdcspyhv
-goodFactors | factors == [] = error "`factors` has no factors."
-            | otherwise     = let sorted = sortBy f factors
-                                  noDups = and $ zipWith g sorted (drop 1 sorted)
-                              in if noDups
-                                    then factors
-                                    else error "`factors` contains duplicates"
-  where f :: (From, Factor, To) -> (From, Factor, To) -> Ordering
-        -- compare :: Ord a => a -> a -> Ordering
-        f = \(a, _, b) (c, _, d) -> if (compare a c) == EQ then (compare b d) else compare a c
-        g :: (From, Factor, To) -> (From, Factor, To) -> Bool
-        g = \(a, _, b) (c, _, d) -> if (a == c && b == d) then False else True
+-- | unit tests.
+unitTests :: TestTree
+unitTests = testGroup "Unit Tests -- `unit-conversion` library functions"
+    [ testCase "non-empty set of defined factors" $
+        assertBool "no factors found" $ factors /= []
+    , testCase "positive factors" allFactorsGT0
+    , testCase "unique factors" noDupFactors
+    , testCase "non-empty values for every key in graph" noEmptyGraphValues
+    , testCase "no circular graph keys" noCircularGraphKeys
+    , testCase "unique `To` values for each graph key" noDupGraphValues
+    , testCase "graph values are valid keys themselves" valuesGraphKeys
+    , testCase "graph keys are valid values themselves" keysGraphValues
+    , testCase "graph keys = units in conversion factors" factorUnitsGraphKeys
+    , testCase "unit conversion" testUnitConversion
+    ]
+
+-- | test if all factors are > 0.0
+allFactorsGT0 :: Assertion
+allFactorsGT0 = allFactorsGT0' factors
+
+-- | test if factor units have no duplicate `Unit` values.
+noDupFactors :: Assertion
+noDupFactors = noDupFactors' factors
+
+-- | test if given graph is empty.
+emptyGraph :: Assertion
+emptyGraph = emptyGraph' factorGraph
+
+-- | test if every key in the graph has a non-empty list of values.
+noEmptyGraphValues :: Assertion
+noEmptyGraphValues = noEmptyGraphValues' factorGraph
+
+-- | test if every key in the graph is NOT contained in its own values.
+noCircularGraphKeys :: Assertion
+noCircularGraphKeys = noCircularGraphKeys' factorGraph
+
+-- | test if every key in the graph has list of values having unique `To`.
+noDupGraphValues :: Assertion
+noDupGraphValues = noDupGraphValues' factorGraph
+
+-- | test if every value associated with a key in the graph is itself a key.
+valuesGraphKeys :: Assertion
+valuesGraphKeys = valuesGraphKeys' factorGraph
+
+-- | test if every key is itself a value for its corresponding values.
+keysGraphValues :: Assertion
+keysGraphValues = keysGraphValues' factorGraph
+
+-- | test factor units exhaustively form all keys in the graph.
+factorUnitsGraphKeys :: Assertion
+factorUnitsGraphKeys = factorUnitsGraphKeys' factorGraph
+
+-- | test unit conversion, comparing actual vs expected for a set of test cases.
+testUnitConversion :: Assertion
+testUnitConversion =
+    let acts :: [Maybe Value] = map convertUnit tcs   -- actuals
+        chks :: [IO ()]       = zipWith f acts exps   -- check actual vs expected
+        f :: Maybe Value -> Maybe Value -> Assertion
+        f x@(Just a) y@(Just b) = assertBool (msg x y) $ withinTolerance a b
+        f Nothing Nothing       = return ()
+        f x y                   = assertBool (msg x y) False
+        withinTolerance :: Value -> Value -> Bool
+        withinTolerance a b = if abs (a - b) <= 0.0001 then True else False
+        msg :: (Show a, Show b) => a -> b -> String
+        msg x y = "(actual) " ++ show x ++ " /= " ++ "(expected) " ++ show y
+    in do -- sequence :: (Traversable t, Monad m) => t (m a) -> m (t a)
+          _ <- sequence chks :: IO [()]
+          return ()
 
 --------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+-- | quickcheck tests.
+qcProps :: TestTree
+qcProps = testGroup "QuickCheck properties -- `unit-conversion` library"
+    [ testProperty "identity conversion" prop_identityConv
+    , testProperty "conversion equivalence" prop_convEquivalence
+    ]
 
+-- | test unit conversion for inputs having the same source & destination units.
+prop_identityConv :: Property
+prop_identityConv = forAll genIdentityConv $
+  \(v, x, y) -> convertUnit (v, x, y) == Just v
+
+-- | test unit conversion for inputs with different source & destination units.
+prop_convEquivalence :: Property
+prop_convEquivalence = forAll genNonIdentityConv $
+  \(val, from, to) -> let res1 = convertUnit (val, from, to)
+                          res2 = convertUnit (0.0, to, from)
+                          f :: Value -> Value -> Bool
+                          f x y = x /= y && y > 0 && abs (y - val) <= 0.0001
+                      in case res1 of
+                          Nothing  -> res2 == Nothing
+                          Just 0.0 -> res2 == Just 0.0
+                          Just x   -> case convertUnit (x, to, from) of
+                                        Nothing   -> False
+                                        Just y    -> f x y
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
