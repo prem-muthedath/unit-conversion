@@ -309,7 +309,7 @@ test_nonEmptyGraph' = do nonEmptyGraph' nonEmpty
 test_noEmptyGraphValues' :: Assertion
 test_noEmptyGraphValues' = do noEmptyGraphValues' genGoodGraph
                               noEmptyGraphValues' bad
-  where bad  = M1.fromList [ (Meters, []), (Yards, [(Meters, 1.0)]) ]
+  where bad = M1.fromList [ (Meters, []), (Yards, [(Meters, 1.0)]) ]
 
 -- | test `noCircularGraphKeys'`
 test_noCircularGraphKeys' :: Assertion
