@@ -36,6 +36,11 @@ noDups f g xs = let sorted = sortBy f xs
 units :: [Unit]
 units = [ toEnum 0 :: Unit .. ]
 
+-- | test if factors is non-empty.
+nonEmptyFactors' :: [(From, Factor, To)] -> Assertion
+nonEmptyFactors' facs =
+  assertBool ("factors `" ++ show facs ++ "` is empty") $ facs /= []
+
 -- | test if all factors are > 0.0
 allFactorsGT0' :: [(From, Factor, To)] -> Assertion
 allFactorsGT0' facs =
@@ -58,10 +63,10 @@ genGoodGraph = M1.fromList $ [ genGoodGraph' u | u <- units ]
                                 vs  = replicate l (1.0 :: Double)
                             in (x, (zip  (filter (/= x) units) vs))
 
--- | test if given graph is empty.
-emptyGraph' :: M1.Map From [(To, Factor)] -> Assertion
-emptyGraph' graph | M1.null graph = assertFailure "empty graph"
-                  | otherwise     = return ()
+-- | test if given graph is non-empty.
+nonEmptyGraph' :: M1.Map From [(To, Factor)] -> Assertion
+nonEmptyGraph' graph | M1.null graph = assertFailure "empty graph"
+                     | otherwise     = return ()
 
 -- | test if every key in the graph has a non-empty list of values.
 noEmptyGraphValues' :: M1.Map From [(To, Factor)] -> Assertion
@@ -247,9 +252,10 @@ unitTestsInternal = testGroup
           ]
         expFail = expectFail $
           testGroup "Unit tests of expected-to-fail internal test functions"
-            [ testCase "`test_allFactorsGT0'`" test_allFactorsGT0'
+            [ testCase "`test_nonEmptyFactors'`" test_nonEmptyFactors'
+            , testCase "`test_allFactorsGT0'`" test_allFactorsGT0'
             , testCase "`test_noDupFactors'`" test_noDupFactors'
-            , testCase "`test_emptyGraph'`" test_emptyGraph'
+            , testCase "`test_nonEmptyGraph'`" test_nonEmptyGraph'
             , testCase "`test_noEmptyGraphValues'`" test_noEmptyGraphValues'
             , testCase "`test_noCircularGraphKeys'`" test_noCircularGraphKeys'
             , testCase "`test_noDupGraphValues'`" test_noDupGraphValues'
@@ -274,6 +280,13 @@ test_genGoodGraph =
                  | any (/= 1.0) (map snd vs) = False
                  | otherwise = True
 
+-- | test `nonEmptyFactors'`
+test_nonEmptyFactors' :: Assertion
+test_nonEmptyFactors' = do nonEmptyFactors' good
+                           nonEmptyFactors' bad
+    where good = [(Meters, 2.0, Yards), (Stone, 4.0, Pounds)]
+          bad  = []
+
 -- | test `allFactorsGT0'`
 test_allFactorsGT0' :: Assertion
 test_allFactorsGT0' = do allFactorsGT0' good  -- expected to pass
@@ -288,10 +301,10 @@ test_noDupFactors' = do noDupFactors' good    -- expected to pass
   where good = [(Meters, 1.0, Meters), (Meters, 2.0, Yards)]
         bad  = [(Meters, 1.0, Yards), (Meters, 2.0, Yards)]  -- duplicates
 
--- | test `emptyGraph'`
-test_emptyGraph' :: Assertion
-test_emptyGraph' = do emptyGraph' nonEmpty
-                      emptyGraph' empty
+-- | test `nonEmptyGraph'`
+test_nonEmptyGraph' :: Assertion
+test_nonEmptyGraph' = do nonEmptyGraph' nonEmpty
+                         nonEmptyGraph' empty
   where nonEmpty = genGoodGraph
         empty     = M1.empty
 

@@ -29,10 +29,10 @@ tests = testGroup "Tests" [Internal.tests, library]
 -- | unit tests.
 unitTests :: TestTree
 unitTests = testGroup "Unit Tests -- `unit-conversion` library functions"
-    [ testCase "non-empty set of defined factors" $
-        assertBool "no factors found" $ factors /= []
+    [ testCase "non-empty set of defined factors" nonEmptyFactors
     , testCase "positive factors" allFactorsGT0
     , testCase "unique factors" noDupFactors
+    , testCase "non-empty graph" nonEmptyGraph
     , testCase "non-empty values for every key in graph" noEmptyGraphValues
     , testCase "no circular graph keys" noCircularGraphKeys
     , testCase "unique `To` values for each graph key" noDupGraphValues
@@ -42,6 +42,10 @@ unitTests = testGroup "Unit Tests -- `unit-conversion` library functions"
     , testCase "unit conversion" testUnitConversion
     ]
 
+-- | test if factors is non-empty.
+nonEmptyFactors :: Assertion
+nonEmptyFactors = nonEmptyFactors' factors
+
 -- | test if all factors are > 0.0
 allFactorsGT0 :: Assertion
 allFactorsGT0 = allFactorsGT0' factors
@@ -50,9 +54,9 @@ allFactorsGT0 = allFactorsGT0' factors
 noDupFactors :: Assertion
 noDupFactors = noDupFactors' factors
 
--- | test if given graph is empty.
-emptyGraph :: Assertion
-emptyGraph = emptyGraph' factorGraph
+-- | test if given graph is non-empty.
+nonEmptyGraph :: Assertion
+nonEmptyGraph = nonEmptyGraph' factorGraph
 
 -- | test if every key in the graph has a non-empty list of values.
 noEmptyGraphValues :: Assertion

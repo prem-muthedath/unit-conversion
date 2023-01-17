@@ -7,7 +7,7 @@ import UnitConversion (Value, From, To, Unit (..))
 --------------------------------------------------------------------------------
 tcs :: [(Value, From, To)]
 tcs = [ -- test cases
-        (101.0, Meters, Meters)
+        (100.0, Meters, Meters)
       , (25.0, Meters, Feet)
       , (34.5, Feet, Inches)
       , (4676.28, Inches, Feet)
