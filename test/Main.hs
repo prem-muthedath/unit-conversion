@@ -23,8 +23,9 @@ main = defaultMain Main.tests
 -- | defines the tests.
 tests :: TestTree
 tests = testGroup "Tests" [Internal.tests, library]
-  where library = testGroup "*** Tests of `unit-conversion` library functions ***"
-                      [unitTests, qcProps]
+  where library = testGroup
+            "*** Tests of `unit-conversion` library functions ***"
+            [unitTests, qcProps]
 --------------------------------------------------------------------------------
 -- | unit tests.
 unitTests :: TestTree

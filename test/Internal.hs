@@ -243,13 +243,10 @@ prop_genNonIdentityConv = forAll genNonIdentityConv $
 --------------------------------------------------------------------------------
 unitTestsInternal :: TestTree
 unitTestsInternal = testGroup
-                      "unit tests -- internal test generators, functions"
-                      [generator, expFail]
-  where generator = testGroup
-          "Unit tests of test data generators"
-          [ testCase "test graph generator" $
-              assertBool "test graph generator bad" test_genGoodGraph
-          ]
+        "unit tests -- internal test generators, functions"
+        [ generator, expFail]
+  where generator = testGroup "Unit tests of test data generators"
+            [ testCase "test graph generator" test_genGoodGraph ]
         expFail = expectFail $
           testGroup "Unit tests of expected-to-fail internal test functions"
             [ testCase "`test_nonEmptyFactors'`" test_nonEmptyFactors'
@@ -268,12 +265,12 @@ unitTestsInternal = testGroup
 -- | ************ unit tests of test functions & test data generators **********
 --------------------------------------------------------------------------------
 -- | test the factor graph generator.
-test_genGoodGraph :: Bool
+test_genGoodGraph :: Assertion
 test_genGoodGraph =
          let mp = genGoodGraph
              ks = M1.keys mp
              ch = [ f k ((M1.!) mp k) | k <- ks, ks == units ]
-         in (ch /= []) && (and ch)
+         in assertBool "bad test graph generator" $ (ch /= []) && (and ch)
     where f :: From -> [(To, Factor)] -> Bool
           f k vs | nub vs /= vs = False
                  | (map fst vs) /= filter (/= k) units = False
