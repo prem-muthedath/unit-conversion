@@ -244,7 +244,7 @@ unitTestsInternal = testGroup
               assertBool "test graph generator bad" test_genGoodGraph
           ]
         expFail = expectFail $
-          testGroup "units test of expected-to-fail internal test functions"
+          testGroup "unit tests of expected-to-fail internal test functions"
             [ testCase "`test_allFactorsGT0'`" test_allFactorsGT0'
             , testCase "`test_noDupFactors'`" test_noDupFactors'
             , testCase "`test_emptyGraph'`" test_emptyGraph'
