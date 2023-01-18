@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
--- | internal module containing tests for functions & generators used in tests.
+-- | internal module containing functions supporting tests as well as tests for 
+-- functions & generators used in tests.
 -- author: Prem Muthedath
 --------------------------------------------------------------------------------
 module Internal where
@@ -16,7 +17,16 @@ import Test.Tasty.QuickCheck (testProperty)
 import Test.QuickCheck
 
 import UnitConversion
-
+--------------------------------------------------------------------------------
+-- Test.Tasty.QuickCheck: https://tinyurl.com/2e8mr9x6
+-- Test.Tasty.HUnit: https://tinyurl.com/4bhyfpd7
+-- Test.Tasty: https://tinyurl.com/y9ehkkht
+-- Test.Tasty.ExpectFailure: https://tinyurl.com/bdhby7wc
+-- Test.QuickCheck: https://tinyurl.com/3at73duf
+-- Test.HUnit: https://tinyurl.com/3u6v74n2
+-- Data.List: https://tinyurl.com/yku7ba69
+-- Data.Map: https://tinyurl.com/ytx3nuab
+-- Prelude: https://tinyurl.com/mpa3vknp
 --------------------------------------------------------------------------------
 -- | ********* internal functions, generators supporting unit tests ************
 --------------------------------------------------------------------------------
@@ -173,6 +183,7 @@ factorUnitsGraphKeys' graph =
 --------------------------------------------------------------------------------
 -- | ********* test code for internal test functions, generators follows *******
 --------------------------------------------------------------------------------
+-- testGroup :: TestName -> [TestTree] -> TestTree
 tests :: TestTree
 tests = testGroup " *** Tests of internal test functions, data generators ***"
           [ qcInternal
@@ -182,6 +193,8 @@ tests = testGroup " *** Tests of internal test functions, data generators ***"
 --------------------------------------------------------------------------------
 -- | ************************* QC internal tests *******************************
 --------------------------------------------------------------------------------
+-- testGroup :: TestName -> [TestTree] -> TestTree
+-- testProperty :: Testable a => TestName -> a -> TestTree
 qcInternal :: TestTree
 qcInternal = testGroup "QuickCheck properties -- internal test functions, generators"
     [ testProperty "generator test: `genGoodFactors`" prop_genGoodFactors
@@ -280,6 +293,9 @@ unitTestsInternal = testGroup
         [ generator, expFail ]
   where generator = testGroup "Unit tests of test data generators"
             [ testCase "test graph generator" test_genGoodGraph ]
+        -- expectFail :: TestTree -> TestTree
+        -- testGroup :: TestName -> [TestTree] -> TestTree
+        -- testCase :: TestName -> Assertion -> TestTree
         expFail = expectFail $
           testGroup "Unit tests of expected-to-fail internal test functions"
             [ testCase "`test_nonEmptyFactors'`" test_nonEmptyFactors'

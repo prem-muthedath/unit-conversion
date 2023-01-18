@@ -15,12 +15,20 @@ import UnitConversion
 import Inputs (tcs, exps)
 import Internal
 --------------------------------------------------------------------------------
+-- Test.Tasty.QuickCheck: https://tinyurl.com/2e8mr9x6
+-- Test.Tasty.HUnit: https://tinyurl.com/4bhyfpd7
+-- Test.Tasty: https://tinyurl.com/y9ehkkht
+-- Test.QuickCheck: https://tinyurl.com/3at73duf
+-- Test.HUnit: https://tinyurl.com/3u6v74n2
+--------------------------------------------------------------------------------
 -- | *********************** test code follows *******************************
 --------------------------------------------------------------------------------
+-- defaultMain :: TestTree -> IO ()
 main :: IO ()
 main = defaultMain Main.tests
 
 -- | defines the tests.
+-- testGroup :: TestName -> [TestTree] -> TestTree
 tests :: TestTree
 tests = testGroup "Tests" [Internal.tests, library]
   where library = testGroup
@@ -28,6 +36,8 @@ tests = testGroup "Tests" [Internal.tests, library]
             [unitTests, qcProps]
 --------------------------------------------------------------------------------
 -- | unit tests.
+-- testGroup :: TestName -> [TestTree] -> TestTree
+-- testCase :: TestName -> Assertion -> TestTree
 unitTests :: TestTree
 unitTests = testGroup "Unit Tests -- `unit-conversion` library functions"
     [ testCase "non-empty set of defined factors" nonEmptyFactors
@@ -107,6 +117,8 @@ testUnitConversion =
 
 --------------------------------------------------------------------------------
 -- | quickcheck tests.
+-- testGroup :: TestName -> [TestTree] -> TestTree
+-- testProperty :: Testable a => TestName -> a -> TestTree
 qcProps :: TestTree
 qcProps = testGroup "QuickCheck properties -- `unit-conversion` library"
     [ testProperty "identity conversion" prop_identityConv
