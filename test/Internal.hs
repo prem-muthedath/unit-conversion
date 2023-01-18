@@ -143,10 +143,10 @@ graphKeyValueFactorRule' graph =
                   Just (_, tf)   -> assertBool (msg kf t tf) $
                     abs (kf - (1.0/tf)) <= 0.0001
                 msg :: Factor -> To -> Factor -> String
-                msg kf t tf = show k ++ " is a graph key that is related to " ++
+                msg kf t tf = show k ++ " is a graph key related to " ++
                   show t ++ " by a factor " ++ show kf ++ ", but " ++ show t
-                  ++ " is realted to " ++ show k ++ " through the wrong factor "
-                  ++ show tf ++ ", instead of the right value " ++ show (1.0/kf)
+                  ++ " is related to " ++ show k ++ "\n through the wrong factor "
+                  ++ show tf ++ ", instead of the true value " ++ show (1.0/kf)
         chks = concat [ f k kvs | (k, kvs) <- M1.toList graph ]
     in processAssertions chks
 
@@ -167,7 +167,7 @@ factorUnitsGraphKeys' graph =
     let ks  = sort $ M1.keys graph
         fs  = sort $ nub $ concat [ [f, t] | (f, _, t) <- factors ]
         msg = "graph keys: " ++ show ks ++ " /= " ++
-              " units in conversion factors: " ++ show fs
+              "units in conversion factors: \n " ++ show fs
     in assertBool msg $ ks == fs
 
 --------------------------------------------------------------------------------
