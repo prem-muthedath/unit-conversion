@@ -100,7 +100,7 @@ testUnitConversion =
         f Nothing Nothing       = return ()
         f x y                   = assertBool (msg x y) False
         withinTolerance :: Value -> Value -> Bool
-        withinTolerance a b = if abs (a - b) <= 0.0001 then True else False
+        withinTolerance a b = abs (a - b) <= 0.0001
         msg :: (Show a, Show b) => a -> b -> String
         msg x y = "(actual) " ++ show x ++ " /= " ++ "(expected) " ++ show y
     in processAssertions chks
