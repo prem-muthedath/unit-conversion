@@ -72,74 +72,69 @@ nonEmptyGraph' graph | M1.null graph = assertFailure "empty graph"
 -- | test if every key in the graph has a non-empty list of values.
 noEmptyGraphValues' :: M1.Map From [(To, Factor)] -> Assertion
 noEmptyGraphValues' graph =
-  let f :: From -> [To] -> IO ()
+  let f :: From -> [To] -> Assertion
       f k tos | tos == [] = assertFailure msg
               | otherwise = return ()
               where msg :: String
                     msg = "empty value: " ++ show tos ++ " for graph key: " ++ show k
       chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
-  in do _ <- sequence chks :: IO [()]
-        return ()
+  in processAssertions chks
 
 -- | test if every key in the graph is NOT contained in its own values.
 noCircularGraphKeys' :: M1.Map From [(To, Factor)] -> Assertion
 noCircularGraphKeys' graph =
-  let f :: From -> [To] -> IO ()
+  let f :: From -> [To] -> Assertion
       f k tos | k `elem` tos = assertFailure msg
               | otherwise = return ()
               where msg :: String
                     msg = "graph key `" ++ show k ++ "` present in its own value."
       chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
-  in do _ <- sequence chks :: IO [()]
-        return ()
+  in processAssertions chks
 
 -- | test if every key in the graph has list of values having unique `To`.
 noDupGraphValues' :: M1.Map From [(To, Factor)] -> Assertion
 noDupGraphValues' graph =
-    let f :: From -> [To] -> IO ()
+    let f :: From -> [To] -> Assertion
         f k tos = assertBool msg $ noDups compare (/=) tos
           where msg :: String
                 msg = "graph key `" ++ show k ++ "` has duplicate `To` values: " ++ show tos
         chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
-    in do _ <- sequence chks :: IO [()]
-          return ()
+    in processAssertions chks
 
 -- | test if every value associated with a key in the graph is itself a key.
 valuesGraphKeys' :: M1.Map From [(To, Factor)] -> Assertion
 valuesGraphKeys' graph =
-    let f :: From -> [To] -> [IO ()]
+    let f :: From -> [To] -> [Assertion]
         f k tos = [ g to ( M1.lookup to graph ) | to <- tos ]
-          where g :: To -> Maybe [(To, Factor)] -> IO ()
+          where g :: To -> Maybe [(To, Factor)] -> Assertion
                 g to Nothing   = assertFailure $ msg to
                 g _ (Just _)   = return ()
                 msg :: To -> String
                 msg to = "graph key `" ++ show k ++ "` has a value `" ++ show to ++
                           "` that is not a graph key itself."
         chks = concat [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
-    in do _ <- sequence chks :: IO [()]
-          return ()
+    in processAssertions chks
 
 -- | test if every key is itself a value for its corresponding values.
 keysGraphValues' :: M1.Map From [(To, Factor)] -> Assertion
 keysGraphValues' graph =
-    let f :: From -> [To] -> [IO ()]
+    let f :: From -> [To] -> [Assertion]
         f k tos = [ g to ( M1.lookup to graph ) | to <- tos ]
-          where g :: To -> Maybe [(To, Factor)] -> IO ()
+          where g :: To -> Maybe [(To, Factor)] -> Assertion
                 g _ Nothing    = error $ "bad test data; failed for key " ++ show k
                 g to (Just vs) = assertBool (msg to) $ k `elem` (map fst vs)
                 msg :: To -> String
                 msg to = show to ++ " is a value of graph key `" ++ show k ++
                   "` but `" ++ show k ++ "` is not a value of the key: " ++ show to
         chks = concat [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
-    in do _ <- sequence chks :: IO [()]
-          return ()
+    in processAssertions chks
 
 -- | test if `k` is a key that has `(t, v)` has one of its values, then the 
 -- graph also has a key `t` with `(k, 1.0/v)` as one of its values.  this rule 
 -- should apply to every value of every key in the graph.
 graphKeyValueFactorRule' :: M1.Map From [(To, Factor)] -> Assertion
 graphKeyValueFactorRule' graph =
-    let f :: From -> [(To, Factor)] -> [IO ()]
+    let f :: From -> [(To, Factor)] -> [Assertion]
         f k kvs = [ g to kf ( M1.lookup to graph ) | (to, kf) <- kvs ]
           where g :: To -> Factor -> Maybe [(To, Factor)] -> Assertion
                 g _ _ Nothing     = error $ "bad test data for key: " ++ show k
@@ -153,8 +148,18 @@ graphKeyValueFactorRule' graph =
                   ++ " is realted to " ++ show k ++ " through the wrong factor "
                   ++ show tf ++ ", instead of the right value " ++ show (1.0/kf)
         chks = concat [ f k kvs | (k, kvs) <- M1.toList graph ]
-    in do _ <- sequence chks :: IO [()]
-          return ()
+    in processAssertions chks
+
+-- | process `[Assertion]` and report the first `Assertion` if any.
+-- throws `assertFailure` if the supplied list is empty.
+-- NOTE: `type Assertion = IO ()`
+processAssertions :: [Assertion] -> Assertion
+processAssertions chks =
+  if length chks /= 0
+     -- sequence :: (Traversable t, Monad m) => t (m a) -> m (t a)
+     then do _ <- sequence chks :: IO [()]
+             return ()
+     else assertFailure "test not executed because `[Assertion]` is empty"
 
 -- | test factor units exhaustively form all keys in the graph.
 factorUnitsGraphKeys' :: M1.Map From [(To, Factor)] -> Assertion

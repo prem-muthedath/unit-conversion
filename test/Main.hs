@@ -103,9 +103,7 @@ testUnitConversion =
         withinTolerance a b = if abs (a - b) <= 0.0001 then True else False
         msg :: (Show a, Show b) => a -> b -> String
         msg x y = "(actual) " ++ show x ++ " /= " ++ "(expected) " ++ show y
-    in do -- sequence :: (Traversable t, Monad m) => t (m a) -> m (t a)
-          _ <- sequence chks :: IO [()]
-          return ()
+    in processAssertions chks
 
 --------------------------------------------------------------------------------
 -- | quickcheck tests.
