@@ -52,7 +52,8 @@ allFactorsGT0' facs =
 noDupFactors' :: [(From, Factor, To)] -> Assertion
 noDupFactors' facs = assertBool msg $
       noDups compare (/=) [ (f, t) | (f, _, t) <- facs ]
-  where msg = "factors " ++ show facs ++ " has duplicate units."
+  where msg :: String
+        msg = "factors " ++ show facs ++ " has duplicate units."
 
 -- | generate a `good` test factor graph.  this is a test mock -- a fake --
 -- graph that mimics just the basic properties of the actual factor graph.
@@ -74,7 +75,8 @@ noEmptyGraphValues' graph =
   let f :: From -> [To] -> IO ()
       f k tos | tos == [] = assertFailure msg
               | otherwise = return ()
-              where msg = "empty value: " ++ show tos ++ " for graph key: " ++ show k
+              where msg :: String
+                    msg = "empty value: " ++ show tos ++ " for graph key: " ++ show k
       chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
   in do _ <- sequence chks :: IO [()]
         return ()
@@ -85,7 +87,8 @@ noCircularGraphKeys' graph =
   let f :: From -> [To] -> IO ()
       f k tos | k `elem` tos = assertFailure msg
               | otherwise = return ()
-              where msg = "graph key `" ++ show k ++ "` present in its own value."
+              where msg :: String
+                    msg = "graph key `" ++ show k ++ "` present in its own value."
       chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
   in do _ <- sequence chks :: IO [()]
         return ()
@@ -95,7 +98,8 @@ noDupGraphValues' :: M1.Map From [(To, Factor)] -> Assertion
 noDupGraphValues' graph =
     let f :: From -> [To] -> IO ()
         f k tos = assertBool msg $ noDups compare (/=) tos
-          where msg = "graph key `" ++ show k ++ "` has duplicate `To` values: " ++ show tos
+          where msg :: String
+                msg = "graph key `" ++ show k ++ "` has duplicate `To` values: " ++ show tos
         chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
     in do _ <- sequence chks :: IO [()]
           return ()
@@ -108,6 +112,7 @@ valuesGraphKeys' graph =
           where g :: To -> Maybe [(To, Factor)] -> IO ()
                 g to Nothing   = assertFailure $ msg to
                 g _ (Just _)   = return ()
+                msg :: To -> String
                 msg to = "graph key `" ++ show k ++ "` has a value `" ++ show to ++
                           "` that is not a graph key itself."
         chks = concat [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
@@ -122,9 +127,32 @@ keysGraphValues' graph =
           where g :: To -> Maybe [(To, Factor)] -> IO ()
                 g _ Nothing    = error $ "bad test data; failed for key " ++ show k
                 g to (Just vs) = assertBool (msg to) $ k `elem` (map fst vs)
+                msg :: To -> String
                 msg to = show to ++ " is a value of graph key `" ++ show k ++
                   "` but `" ++ show k ++ "` is not a value of the key: " ++ show to
         chks = concat [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
+    in do _ <- sequence chks :: IO [()]
+          return ()
+
+-- | test if `k` is a key that has `(t, v)` has one of its values, then the 
+-- graph also has a key `t` with `(k, 1.0/v)` as one of its values.  this rule 
+-- should apply to every value of every key in the graph.
+graphKeyValueFactorRule' :: M1.Map From [(To, Factor)] -> Assertion
+graphKeyValueFactorRule' graph =
+    let f :: From -> [(To, Factor)] -> [IO ()]
+        f k kvs = [ g to kf ( M1.lookup to graph ) | (to, kf) <- kvs ]
+          where g :: To -> Factor -> Maybe [(To, Factor)] -> Assertion
+                g _ _ Nothing     = error $ "bad test data for key: " ++ show k
+                g t kf (Just tvs) = case find (\(x, _) -> x == k) tvs of
+                  Nothing        -> error $ "bad test data for key: " ++ show k
+                  Just (_, tf)   -> assertBool (msg kf t tf) $
+                    abs (kf - (1.0/tf)) <= 0.0001
+                msg :: Factor -> To -> Factor -> String
+                msg kf t tf = show k ++ " is a graph key that is related to " ++
+                  show t ++ " by a factor " ++ show kf ++ ", but " ++ show t
+                  ++ " is realted to " ++ show k ++ " through the wrong factor "
+                  ++ show tf ++ ", instead of the right value " ++ show (1.0/kf)
+        chks = concat [ f k kvs | (k, kvs) <- M1.toList graph ]
     in do _ <- sequence chks :: IO [()]
           return ()
 
@@ -209,6 +237,14 @@ genNonIdentityConv = do
 --------------------------------------------------------------------------------
 -- | ******* QuickCheck properties -- internal functions & QC generators *******
 --------------------------------------------------------------------------------
+-- | test `genGoodFactors` generator.
+prop_genGoodFactors :: Property
+prop_genGoodFactors = forAll genGoodFactors $
+  \xs -> let ok   = and $ map (\(_, f, _) -> f > 0) xs
+             us   = [ (u1, u2) | (u1, _, u2) <- xs ]
+             uniq = nub us == us
+         in ok && uniq
+
 -- | test `noDups` function.
 prop_noDups :: Property
 prop_noDups = forAll genGoodFactors $
@@ -219,14 +255,6 @@ prop_noDups = forAll genGoodFactors $
         f = \(a, _, b) (c, _, d) -> if a /= c then compare a c else compare b d
         g :: (From, Factor, To) -> (From, Factor, To) -> Bool
         g = \(a, _, b) (c, _, d) -> not (a == c && b == d)
-
--- | test `genGoodFactors` generator.
-prop_genGoodFactors :: Property
-prop_genGoodFactors = forAll genGoodFactors $
-  \xs -> let ok   = and $ map (\(_, f, _) -> f > 0) xs
-             us   = [ (u1, u2) | (u1, _, u2) <- xs ]
-             uniq = nub us == us
-         in ok && uniq
 
 -- | test `genIdentityConv` generator.
 prop_genIdentityConv :: Property
@@ -258,6 +286,7 @@ unitTestsInternal = testGroup
             , testCase "`test_noDupGraphValues'`" test_noDupGraphValues'
             , testCase "`test_valuesGraphKeys'`" test_valuesGraphKeys'
             , testCase "`test_keysGraphValues'`" test_keysGraphValues'
+            , testCase "`test_graphKeyValueFactorRule'`" test_graphKeyValueFactorRule'
             , testCase "`test_factorUnitsGraphKeys'`" test_factorUnitsGraphKeys'
             ]
 
@@ -346,6 +375,15 @@ test_keysGraphValues' = do keysGraphValues' genGoodGraph
                           , (Yards, [ (Inches, 3.0), (Centimeters, 2.0) ] )
                           ]
 
+-- | test `graphKeyValueFactorRule'`
+test_graphKeyValueFactorRule' :: Assertion
+test_graphKeyValueFactorRule' = do graphKeyValueFactorRule' genGoodGraph
+                                   graphKeyValueFactorRule' bad
+  where bad = M1.fromList [ (Meters, [ (Yards, 5.0), (Feet, 1.0) ] )
+                          , (Feet, [ (Meters, 1.0) ] )
+                          , (Yards, [ (Meters, 15.0) ] )
+                          ]
+
 -- | test `factorUnitsGraphKeys'`
 test_factorUnitsGraphKeys' :: Assertion
 test_factorUnitsGraphKeys' = do factorUnitsGraphKeys' genGoodGraph
@@ -354,6 +392,7 @@ test_factorUnitsGraphKeys' = do factorUnitsGraphKeys' genGoodGraph
                           , (Stone, [ (Pounds, 4.0), (Grams, 3.0) ] )
                           , (Yards, [ (Inches, 3.0), (Centimeters, 2.0) ] )
                           ]
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 

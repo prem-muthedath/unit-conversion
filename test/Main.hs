@@ -39,6 +39,7 @@ unitTests = testGroup "Unit Tests -- `unit-conversion` library functions"
     , testCase "unique `To` values for each graph key" noDupGraphValues
     , testCase "graph values are valid keys themselves" valuesGraphKeys
     , testCase "graph keys are valid values themselves" keysGraphValues
+    , testCase "graph key-value rule for factors" graphKeyValueFactorRule
     , testCase "graph keys = units in conversion factors" factorUnitsGraphKeys
     , testCase "unit conversion" testUnitConversion
     ]
@@ -78,6 +79,12 @@ valuesGraphKeys = valuesGraphKeys' factorGraph
 -- | test if every key is itself a value for its corresponding values.
 keysGraphValues :: Assertion
 keysGraphValues = keysGraphValues' factorGraph
+
+-- | test if `k` is a key that has `(t, v)` has one of its values, then the 
+-- graph also has a key `t` with `(k, 1.0/v)` as one of its values.  this rule 
+-- should apply to every value of every key in the graph.
+graphKeyValueFactorRule :: Assertion
+graphKeyValueFactorRule = graphKeyValueFactorRule' factorGraph
 
 -- | test factor units exhaustively form all keys in the graph.
 factorUnitsGraphKeys :: Assertion
