@@ -20,6 +20,8 @@ import Internal
 -- Test.Tasty: https://tinyurl.com/y9ehkkht
 -- Test.QuickCheck: https://tinyurl.com/3at73duf
 -- Test.HUnit: https://tinyurl.com/3u6v74n2
+-- organize tests using Tasty: https://github.com/UnkindPartition/tasty
+-- practical testing in haskell: /u/ jasper: https://tinyurl.com/3ajhndmt
 --------------------------------------------------------------------------------
 -- | *********************** test code follows *******************************
 --------------------------------------------------------------------------------

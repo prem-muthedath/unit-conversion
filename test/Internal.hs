@@ -27,6 +27,8 @@ import UnitConversion
 -- Data.List: https://tinyurl.com/yku7ba69
 -- Data.Map: https://tinyurl.com/ytx3nuab
 -- Prelude: https://tinyurl.com/mpa3vknp
+-- organize tests using Tasty: https://github.com/UnkindPartition/tasty
+-- practical testing in haskell: /u/ jasper: https://tinyurl.com/3ajhndmt
 --------------------------------------------------------------------------------
 -- | ********* internal functions, generators supporting unit tests ************
 --------------------------------------------------------------------------------
