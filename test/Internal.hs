@@ -291,15 +291,15 @@ prop_genNonIdentityConv = forAll genNonIdentityConv $
 --------------------------------------------------------------------------------
 unitTestsInternal :: TestTree
 unitTestsInternal = testGroup
-        "unit tests -- internal test generators, functions"
+        "Unit tests -- internal test generators, functions"
         [ generator, expFail ]
-  where generator = testGroup "Unit tests of test data generators"
+  where generator = testGroup "unit tests of test data generators"
             [ testCase "test graph generator" test_genGoodGraph ]
         -- expectFail :: TestTree -> TestTree
         -- testGroup :: TestName -> [TestTree] -> TestTree
         -- testCase :: TestName -> Assertion -> TestTree
         expFail = expectFail $
-          testGroup "Unit tests of expected-to-fail internal test functions"
+          testGroup "unit tests of expected-to-fail internal test functions"
             [ testCase "`test_nonEmptyFactors'`" test_nonEmptyFactors'
             , testCase "`test_allFactorsGT0'`" test_allFactorsGT0'
             , testCase "`test_noDupFactors'`" test_noDupFactors'
