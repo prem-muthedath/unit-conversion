@@ -1,0 +1,71 @@
+Tests
+   *** Tests of internal test functions, data generators ***
+    QuickCheck properties -- internal test functions, generators
+      generator test: `genGoodFactors`:         OK (0.02s)
+        +++ OK, passed 100 tests.
+      generator test: `genIdentityConv`:        OK
+        +++ OK, passed 100 tests.
+      generator test: `genNonIdentityConv`:     OK
+        +++ OK, passed 100 tests.
+      `noDups` function:                        OK (0.02s)
+        +++ OK, passed 100 tests.
+    unit tests -- internal test generators, functions
+      Unit tests of test data generators
+        test graph generator:                   OK
+      Unit tests of expected-to-fail internal test functions
+        `test_nonEmptyFactors'`:                FAIL (expected)
+          test/Internal.hs:42:
+          factors `[]` is empty (expected failure)
+        `test_allFactorsGT0'`:                  FAIL (expected)
+          test/Internal.hs:49:
+          factor (Meters,-1.0,Meters) has value <= 0 (expected failure)
+        `test_noDupFactors'`:                   FAIL (expected)
+          test/Internal.hs:53:
+          factors [(Meters,1.0,Yards),(Meters,2.0,Yards)] has duplicate units. (expected failure)
+        `test_nonEmptyGraph'`:                  FAIL (expected)
+          test/Internal.hs:69:
+          empty graph (expected failure)
+        `test_noEmptyGraphValues'`:             FAIL (expected)
+          test/Internal.hs:76:
+          empty value: [] for graph key: Meters (expected failure)
+        `test_noCircularGraphKeys'`:            FAIL (expected)
+          test/Internal.hs:87:
+          graph key `Stone` present in its own value. (expected failure)
+        `test_noDupGraphValues'`:               FAIL (expected)
+          test/Internal.hs:98:
+          graph key `Stone` has duplicate `To` values: [Grams,Kilograms,Grams] (expected failure)
+        `test_valuesGraphKeys'`:                FAIL (expected)
+          test/Internal.hs:110:
+          graph key `Meters` has a value `Feet` that is not a graph key itself. (expected failure)
+        `test_keysGraphValues'`:                FAIL (expected)
+          test/Internal.hs:125:
+          Yards is a value of graph key `Meters` but `Meters` is not a value of the key: Yards (expected failure)
+        `test_graphKeyValueFactorRule'`:        FAIL (expected)
+          test/Internal.hs:143:
+          Meters is a graph key that is related to Yards by a factor 5.0, but Yards is realted to Meters through the wrong factor 15.0, instead of the right value 0.2 (expected failure)
+        `test_factorUnitsGraphKeys'`:           FAIL (expected)
+          test/Internal.hs:171:
+          graph keys: [Meters,Yards,Stone] /=  units in conversion factors: [Meters,Feet,Inches,Centimeters,Millimeters,Yards,Kilograms,Grams,Pounds,Stone] (expected failure)
+  *** Tests of `unit-conversion` library functions ***
+    Unit Tests -- `unit-conversion` library functions
+      non-empty set of defined factors:         OK
+      positive factors:                         OK
+      unique factors:                           OK
+      non-empty graph:                          OK
+      non-empty values for every key in graph:  OK
+      no circular graph keys:                   OK
+      unique `To` values for each graph key:    OK
+      graph values are valid keys themselves:   OK
+      graph keys are valid values themselves:   OK
+      graph key-value rule for factors:         OK
+      graph keys = units in conversion factors: OK
+      unit conversion:                          OK
+    QuickCheck properties -- `unit-conversion` library
+      identity conversion:                      OK
+        +++ OK, passed 100 tests.
+      conversion equivalence:                   OK
+        +++ OK, passed 100 tests.
+
+All 30 tests passed (0.06s)
+*** Exception: ExitSuccess
+
