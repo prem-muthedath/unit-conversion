@@ -88,7 +88,14 @@ noEmptyGraphValues' graph =
       f k tos | tos == [] = assertFailure msg
               | otherwise = return ()
               where msg :: String
-                    msg = "empty value: " ++ show tos ++ " for graph key: " ++ show k
+                    -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+                    -- (<>) :: Semigroup a => a -> a -> a
+                    msg = foldr (<>) []
+                      [ "empty value: "
+                      , show tos
+                      , " for graph key: "
+                      , show k
+                      ]
       chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
   in processAssertions chks
 
@@ -99,7 +106,13 @@ noCircularGraphKeys' graph =
       f k tos | k `elem` tos = assertFailure msg
               | otherwise = return ()
               where msg :: String
-                    msg = "graph key `" ++ show k ++ "` present in its own value."
+                    -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+                    -- (<>) :: Semigroup a => a -> a -> a
+                    msg = foldr (<>) []
+                      [ "graph key `"
+                      , show k
+                      , "` present in its own value."
+                      ]
       chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
   in processAssertions chks
 
@@ -109,7 +122,14 @@ noDupGraphValues' graph =
     let f :: From -> [To] -> Assertion
         f k tos = assertBool msg $ noDups compare (/=) tos
           where msg :: String
-                msg = "graph key `" ++ show k ++ "` has duplicate `To` values: " ++ show tos
+                -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+                -- (<>) :: Semigroup a => a -> a -> a
+                msg = foldr (<>) []
+                  [ "graph key `"
+                  , show k
+                  , "` has duplicate `To` values: "
+                  , show tos
+                  ]
         chks = [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
     in processAssertions chks
 
@@ -122,8 +142,15 @@ valuesGraphKeys' graph =
                 g to Nothing   = assertFailure $ msg to
                 g _ (Just _)   = return ()
                 msg :: To -> String
-                msg to = "graph key `" ++ show k ++ "` has a value `" ++ show to ++
-                          "` that is not a graph key itself."
+                -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+                -- (<>) :: Semigroup a => a -> a -> a
+                msg to = foldr (<>) []
+                    [ "graph key `"
+                    , show k
+                    , "` has a value `"
+                    , show to
+                    , "` that is not a graph key itself."
+                    ]
         chks = concat [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
     in processAssertions chks
 
@@ -133,11 +160,24 @@ keysGraphValues' graph =
     let f :: From -> [To] -> [Assertion]
         f k tos = [ g to ( M1.lookup to graph ) | to <- tos ]
           where g :: To -> Maybe [(To, Factor)] -> Assertion
-                g _ Nothing    = error $ "bad test data; failed for key " ++ show k
+                g _ Nothing    = error $ "bad test data; for key " ++ show k
                 g to (Just vs) = assertBool (msg to) $ k `elem` (map fst vs)
                 msg :: To -> String
-                msg to = show to ++ " is a value of graph key `" ++ show k ++
-                  "` but `" ++ show k ++ "` is not a value of the key: " ++ show to
+                -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+                -- shows :: Show a => a -> ShowS
+                -- showString :: String -> ShowS
+                -- type ShowS = String -> String
+                -- NOTE: foldr (\x acc -> x . acc) (showString "")
+                -- :: Foldable t => t (String -> String) -> String -> String
+                msg to = foldr (\x acc -> x . acc) (showString "")
+                    [ shows to
+                    , showString " is a value of graph key `"
+                    , shows k
+                    , showString "`, but `"
+                    , shows k
+                    , showString "` is missing as a value of the key: "
+                    , shows to
+                    ] $ []
         chks = concat [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
     in processAssertions chks
 
@@ -155,10 +195,28 @@ graphKeyValueFactorRule' graph =
                   Just (_, tf)   -> assertBool (msg kf t tf) $
                     abs (kf - (1.0/tf)) <= 0.0001
                 msg :: Factor -> To -> Factor -> String
-                msg kf t tf = show k ++ " is a graph key related to " ++
-                  show t ++ " by a factor " ++ show kf ++ ", but " ++ show t
-                  ++ " is related to " ++ show k ++ "\n through the wrong factor "
-                  ++ show tf ++ ", instead of the true value " ++ show (1.0/kf)
+                -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+                -- shows :: Show a => a -> ShowS
+                -- showString :: String -> ShowS
+                -- type ShowS = String -> String
+                -- NOTE: foldr (\x acc -> x . acc) (showString "")
+                -- :: Foldable t => t (String -> String) -> String -> String
+                msg kf t tf = foldr (\x acc -> x . acc) (showString "")
+                          [ shows k
+                          , showString " is a graph key related to "
+                          , shows t
+                          , showString " by a factor "
+                          , shows kf
+                          , showString ", but "
+                          , shows t
+                          , showString " as a key is related to "
+                          , shows k
+                          , showString "\n through a 'possible' wrong factor "
+                          , shows tf
+                          , showString ", instead of the expected value "
+                          , shows (1.0/kf)
+                          ] $ []
+
         chks = concat [ f k kvs | (k, kvs) <- M1.toList graph ]
     in processAssertions chks
 
