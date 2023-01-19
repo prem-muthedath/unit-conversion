@@ -69,7 +69,7 @@ tested-with: GHC == 8.10.4
 --
 --       `cabal v2-run -f -testing :unit-conversion-test`
 --
---    6. if `Testing` = False`, then `TESTING` is undefined, so functions within 
+--    6. if `Testing = False`, then `TESTING` is undefined, so functions within 
 --       `#ifdef TESTING ... #endif` block in module export will be hidden.
 -- REF:
 --  1. https://tinyurl.com/4ajtp3wn (cabal 3.40 docs on flags & CPP)
