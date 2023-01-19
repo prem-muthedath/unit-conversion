@@ -333,6 +333,7 @@ prop_noDups = forAll genGoodFactors $
   where f :: (From, Factor, To) -> (From, Factor, To) -> Ordering
         -- compare :: Ord a => a -> a -> Ordering
         -- /u/ peargreen https://tinyurl.com/2p8p2j2e (reddit)
+        -- haskell-notes--compare-tuple-list-using-mappend--peargreen.lhs
         f = \(a, _, b) (c, _, d) -> if a /= c then compare a c else compare b d
         g :: (From, Factor, To) -> (From, Factor, To) -> Bool
         g = \(a, _, b) (c, _, d) -> not (a == c && b == d)
