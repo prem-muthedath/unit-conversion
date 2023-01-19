@@ -15,11 +15,11 @@ import UnitConversion
 import Inputs (tcs, exps)
 import Internal
 --------------------------------------------------------------------------------
--- Test.Tasty.QuickCheck: https://tinyurl.com/2e8mr9x6
--- Test.Tasty.HUnit: https://tinyurl.com/4bhyfpd7
 -- Test.Tasty: https://tinyurl.com/y9ehkkht
--- Test.QuickCheck: https://tinyurl.com/3at73duf
+-- Test.Tasty.HUnit: https://tinyurl.com/4bhyfpd7
+-- Test.Tasty.QuickCheck: https://tinyurl.com/2e8mr9x6
 -- Test.HUnit: https://tinyurl.com/3u6v74n2
+-- Test.QuickCheck: https://tinyurl.com/3at73duf
 -- organize tests using Tasty: https://github.com/UnkindPartition/tasty
 -- practical testing in haskell: /u/ jasper: https://tinyurl.com/3ajhndmt
 --------------------------------------------------------------------------------

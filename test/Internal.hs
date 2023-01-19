@@ -18,12 +18,12 @@ import Test.QuickCheck
 
 import UnitConversion
 --------------------------------------------------------------------------------
--- Test.Tasty.QuickCheck: https://tinyurl.com/2e8mr9x6
--- Test.Tasty.HUnit: https://tinyurl.com/4bhyfpd7
 -- Test.Tasty: https://tinyurl.com/y9ehkkht
+-- Test.Tasty.HUnit: https://tinyurl.com/4bhyfpd7
+-- Test.Tasty.QuickCheck: https://tinyurl.com/2e8mr9x6
 -- Test.Tasty.ExpectFailure: https://tinyurl.com/bdhby7wc
--- Test.QuickCheck: https://tinyurl.com/3at73duf
 -- Test.HUnit: https://tinyurl.com/3u6v74n2
+-- Test.QuickCheck: https://tinyurl.com/3at73duf
 -- Data.List: https://tinyurl.com/yku7ba69
 -- Data.Map: https://tinyurl.com/ytx3nuab
 -- Prelude: https://tinyurl.com/mpa3vknp
@@ -268,7 +268,7 @@ prop_genGoodFactors = forAll genGoodFactors $
 -- | test `noDups` function.
 prop_noDups :: Property
 prop_noDups = forAll genGoodFactors $
-  \xs -> (noDups f g xs == True) && (noDups f g (xs ++ xs) == False)
+  \xs -> (noDups f g xs) && not (noDups f g (xs ++ xs))
   where f :: (From, Factor, To) -> (From, Factor, To) -> Ordering
         -- compare :: Ord a => a -> a -> Ordering
         -- /u/ peargreen https://tinyurl.com/2p8p2j2e (reddit)
@@ -303,6 +303,8 @@ unitTestsInternal = testGroup
             [ testCase "`test_nonEmptyFactors'`" test_nonEmptyFactors'
             , testCase "`test_allFactorsGT0'`" test_allFactorsGT0'
             , testCase "`test_noDupFactors'`" test_noDupFactors'
+            , testCase "`test_processAssertions`" test_processAssertions
+            , testCase "`test_processAssertionsNil`" test_processAssertionsNil
             , testCase "`test_nonEmptyGraph'`" test_nonEmptyGraph'
             , testCase "`test_noEmptyGraphValues'`" test_noEmptyGraphValues'
             , testCase "`test_noCircularGraphKeys'`" test_noCircularGraphKeys'
@@ -349,6 +351,23 @@ test_noDupFactors' = do noDupFactors' good    -- expected to pass
                         noDupFactors' bad     -- expected to fail
   where good = [(Meters, 1.0, Meters), (Meters, 2.0, Yards)]
         bad  = [(Meters, 1.0, Yards), (Meters, 2.0, Yards)]  -- duplicates
+
+-- | test `processAssertions`
+test_processAssertions :: Assertion
+test_processAssertions = do processAssertions good
+                            processAssertions bad
+  where good = [ assertBool "pass" True
+               , assertBool "pass" True
+               , assertBool "pass" True
+               ]
+        bad  = [ assertBool "pass" True
+               , assertBool "Assertion failure because of `False` value" False
+               , assertBool "pass" True
+               ]
+
+-- | test `processAssertionsNil`
+test_processAssertionsNil :: Assertion
+test_processAssertionsNil = processAssertions ([] :: [Assertion])
 
 -- | test `nonEmptyGraph'`
 test_nonEmptyGraph' :: Assertion
