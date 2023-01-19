@@ -7,7 +7,7 @@ Tests
         +++ OK, passed 100 tests.
       generator test: `genNonIdentityConv`:     OK
         +++ OK, passed 100 tests.
-      `noDups` function:                        OK (0.02s)
+      `noDups` function:                        OK (0.03s)
         +++ OK, passed 100 tests.
     Unit tests -- internal test generators, functions
       unit tests of test data generators
@@ -23,10 +23,10 @@ Tests
           test/Internal.hs:65:
           factors [(Meters,1.0,Yards),(Meters,2.0,Yards)] has duplicate units. (expected failure)
         `test_processAssertions`:               FAIL (expected)
-          test/Internal.hs:422:
+          test/Internal.hs:425:
           Assertion failure because of `False` value (expected failure)
         `test_processAssertionsNil`:            FAIL (expected)
-          test/Internal.hs:232:
+          test/Internal.hs:235:
           test not executed because `[Assertion]` is empty (expected failure)
         `test_nonEmptyGraph'`:                  FAIL (expected)
           test/Internal.hs:81:
@@ -49,9 +49,9 @@ Tests
         `test_graphKeyValueFactorRule'`:        FAIL (expected)
           test/Internal.hs:195:
           Meters is a graph key related to Yards by a factor 5.0, but Yards as a key is related to Meters
-           through a 'possible' wrong factor 15.0, instead of the expected value 0.2 (expected failure)
+           through a 'possible' wrong factor 15.0, instead of the expected value 1.0/5.0 = 0.2 (expected failure)
         `test_factorUnitsGraphKeys'`:           FAIL (expected)
-          test/Internal.hs:241:
+          test/Internal.hs:244:
           graph keys: [Meters,Yards,Stone] /= units in conversion factors: 
            [Meters,Feet,Inches,Centimeters,Millimeters,Yards,Kilograms,Grams,Pounds,Stone] (expected failure)
   *** Tests of `unit-conversion` library functions ***
@@ -74,6 +74,6 @@ Tests
       conversion equivalence:                   OK
         +++ OK, passed 100 tests.
 
-All 32 tests passed (0.06s)
+All 32 tests passed (0.07s)
 *** Exception: ExitSuccess
 

@@ -214,6 +214,9 @@ graphKeyValueFactorRule' graph =
                           , showString "\n through a 'possible' wrong factor "
                           , shows tf
                           , showString ", instead of the expected value "
+                          , showString "1.0/"
+                          , shows kf
+                          , showString " = "
                           , shows (1.0/kf)
                           ] $ []
 
