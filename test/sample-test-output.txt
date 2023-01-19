@@ -7,7 +7,7 @@ Tests
         +++ OK, passed 100 tests.
       generator test: `genNonIdentityConv`:     OK
         +++ OK, passed 100 tests.
-      `noDups` function:                        OK (0.03s)
+      `noDups` function:                        OK (0.02s)
         +++ OK, passed 100 tests.
     Unit tests -- internal test generators, functions
       unit tests of test data generators
@@ -22,6 +22,12 @@ Tests
         `test_noDupFactors'`:                   FAIL (expected)
           test/Internal.hs:65:
           factors [(Meters,1.0,Yards),(Meters,2.0,Yards)] has duplicate units. (expected failure)
+        `test_processAssertions`:               FAIL (expected)
+          test/Internal.hs:364:
+          Assertion failure because of `False` value (expected failure)
+        `test_processAssertionsNil`:            FAIL (expected)
+          test/Internal.hs:174:
+          test not executed because `[Assertion]` is empty (expected failure)
         `test_nonEmptyGraph'`:                  FAIL (expected)
           test/Internal.hs:81:
           empty graph (expected failure)
@@ -68,6 +74,6 @@ Tests
       conversion equivalence:                   OK
         +++ OK, passed 100 tests.
 
-All 30 tests passed (0.05s)
+All 32 tests passed (0.05s)
 *** Exception: ExitSuccess
 
