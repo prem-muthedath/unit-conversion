@@ -36,6 +36,10 @@ import UnitConversion
 -- duplicates check code from /u/ dfeuer (so) @ https://tinyurl.com/bdcspyhv
 -- sortBy :: (a -> a -> Ordering) -> [a] -> [a]
 -- zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+-- list sorting:
+    -- /u/ peargreen https://tinyurl.com/2p8p2j2e (reddit)
+    -- haskell-notes--compare-tuple-list-using-mappend--peargreen.lhs
+    -- list sorting, roman cheplyaka @ https://tinyurl.com/2s49u8kf
 noDups :: (Ord a, Eq a)
        => (a -> a -> Ordering)  -- ordering for sorting: `compare` or equivalent
        -> (a -> a -> Bool)      -- test uniqueness, using `==` or `/=`
@@ -228,6 +232,20 @@ graphKeyValueFactorRule' graph =
 -- NOTE: `type Assertion = IO ()`
 processAssertions :: [Assertion] -> Assertion
 processAssertions chks =
+  -- NOTE: we need some way to check if `chks` is not empty.  one way is to try 
+  -- the usual `chks /= []` condition, which will normally force a pattern match 
+  -- on `chks`, forcing element evaluation. but this code will not work here, 
+  -- because `instance Eq [IO ()]` & `instance Eq (IO ())` both do not exist.  
+  -- and, by the way, even if those instances did exist, `chks /= []` condition, 
+  -- by forcing element evaluation of `[Assertion]`, will throw an exception, so 
+  -- we will never be able to complete the conditional check.
+  --
+  -- another way is to use `length chks /= 0`, which will work, because it does 
+  -- not require any `Eq` instances, and since `length` does not force list 
+  -- element evaluation, there is no risk of exception either, allowing us to 
+  -- complete the conditional check safely. so that's what we have done here.
+  --
+  -- on 'list forcing', see roman cheplyaka @ https://tinyurl.com/ycx6ytxt
   if length chks /= 0
      -- sequence :: (Traversable t, Monad m) => t (m a) -> m (t a)
      then do _ <- sequence chks :: IO [()]
@@ -334,6 +352,7 @@ prop_noDups = forAll genGoodFactors $
         -- compare :: Ord a => a -> a -> Ordering
         -- /u/ peargreen https://tinyurl.com/2p8p2j2e (reddit)
         -- haskell-notes--compare-tuple-list-using-mappend--peargreen.lhs
+        -- list sorting, roman cheplyaka @ https://tinyurl.com/2s49u8kf
         f = \(a, _, b) (c, _, d) -> if a /= c then compare a c else compare b d
         g :: (From, Factor, To) -> (From, Factor, To) -> Bool
         g = \(a, _, b) (c, _, d) -> not (a == c && b == d)
