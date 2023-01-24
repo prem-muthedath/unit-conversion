@@ -1,5 +1,5 @@
 #### unit-conversion
-
+<sub>
 simple (linear & proportional) unit conversions.
 
 inspired by Jane Street python implementation of a similiar problem @   
@@ -46,4 +46,4 @@ how to use the library & run the tests:
 
         - `cabal v2-repl -f testing :unit-conversion-test`
         - `main`
-
+</sub>
