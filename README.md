@@ -1,10 +1,10 @@
 #### unit-conversion
 <sub>
 simple (linear & proportional) unit conversions.
-
-inspired by Jane Street python implementation of a similiar problem @   
+</sub>
+<sub>inspired by Jane Street python implementation of a similiar problem @   
 https://www.youtube.com/watch?v=VfbFJISCP3g.
-
+</sub>
 author: Prem Muthedath
 
 scope:
@@ -46,4 +46,4 @@ how to use the library & run the tests:
 
         - `cabal v2-repl -f testing :unit-conversion-test`
         - `main`
-</sub>
+
