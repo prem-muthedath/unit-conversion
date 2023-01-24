@@ -60,7 +60,7 @@ nonEmptyFactors' facs =
 -- | test if all factors are > 0.0
 allFactorsGT0' :: [(From, Factor, To)] -> Assertion
 allFactorsGT0' facs =
-  case find (\(_, v, _) -> v <= 0) facs of
+  case find (\ (_, v, _) -> v <= 0) facs of
       Nothing -> return ()
       Just f  -> assertFailure ("factor " ++ show f ++ " has value <= 0")
 
@@ -171,9 +171,9 @@ keysGraphValues' graph =
                 -- shows :: Show a => a -> ShowS
                 -- showString :: String -> ShowS
                 -- type ShowS = String -> String
-                -- NOTE: foldr (\x acc -> x . acc) (showString "")
+                -- NOTE: foldr (\ x acc -> x . acc) (showString "")
                 -- :: Foldable t => t (String -> String) -> String -> String
-                msg to = foldr (\x acc -> x . acc) (showString "")
+                msg to = foldr (\ x acc -> x . acc) (showString "")
                     [ shows to
                     , showString " is a value of graph key `"
                     , shows k
@@ -194,7 +194,7 @@ graphKeyValueFactorRule' graph =
         f k kvs = [ g to kf ( M1.lookup to graph ) | (to, kf) <- kvs ]
           where g :: To -> Factor -> Maybe [(To, Factor)] -> Assertion
                 g _ _ Nothing     = error $ "bad test data for key: " ++ show k
-                g t kf (Just tvs) = case find (\(x, _) -> x == k) tvs of
+                g t kf (Just tvs) = case find (\ (x, _) -> x == k) tvs of
                   Nothing        -> error $ "bad test data for key: " ++ show k
                   Just (_, tf)   -> assertBool (msg kf t tf) $
                     abs (kf - (1.0/tf)) <= 0.0001
@@ -203,9 +203,9 @@ graphKeyValueFactorRule' graph =
                 -- shows :: Show a => a -> ShowS
                 -- showString :: String -> ShowS
                 -- type ShowS = String -> String
-                -- NOTE: foldr (\x acc -> x . acc) (showString "")
+                -- NOTE: foldr (\ x acc -> x . acc) (showString "")
                 -- :: Foldable t => t (String -> String) -> String -> String
-                msg kf t tf = foldr (\x acc -> x . acc) (showString "")
+                msg kf t tf = foldr (\ x acc -> x . acc) (showString "")
                           [ shows k
                           , showString " is a graph key related to "
                           , shows t
@@ -240,13 +240,19 @@ processAssertions chks =
   -- by forcing element evaluation of `[Assertion]`, will throw an exception, so 
   -- we will never be able to complete the conditional check.
   --
-  -- another way is to use `length chks /= 0`, which will work, because it does 
-  -- not require any `Eq` instances, and since `length` does not force list 
-  -- element evaluation, there is no risk of exception either, allowing us to 
-  -- complete the conditional check safely. so that's what we have done here.
+  -- another way is to use `not $ null chks`, which will work, because it does 
+  -- not require any `Eq` instances, and since `null = foldr (\_ _ -> False) 
+  -- True` does not force list element evaluation, there is no risk of exception 
+  -- either, allowing us to complete the conditional check safely. so that's 
+  -- what we have done here.
+  --
+  -- by the way, we could have used `length chks /= 0` instead of `null`, and it 
+  -- would have worked as well, because `length = foldl' (\c _ -> c+1) 0` does 
+  -- not force element evaluation, just like `null`.  but i went with `null` 
+  -- because it fits our purpose, and it terminates even for infinite lists.
   --
   -- on 'list forcing', see roman cheplyaka @ https://tinyurl.com/ycx6ytxt
-  if length chks /= 0
+  if not $ null chks
      -- sequence :: (Traversable t, Monad m) => t (m a) -> m (t a)
      then do _ <- sequence chks :: IO [()]
              return ()
@@ -296,7 +302,7 @@ genGoodFactors :: Gen [(From, Factor, To)]
 genGoodFactors = do
       us <- f1
       vs <- f2 (length us)
-      return $ zipWith (\(a, b) c -> (a, c, b)) us vs
+      return $ zipWith (\ (a, b) c -> (a, c, b)) us vs
   where f1 :: Gen [(Unit, Unit)]
         f1 = nub <$> (listOf1 $ do
           x <- arbitrary :: Gen Unit
@@ -304,7 +310,7 @@ genGoodFactors = do
           return (x, y))
         f2 :: Int -> Gen [Double]
         f2 l = vectorOf l $
-          (arbitrary :: Gen Double) `suchThat` (\v -> v > 0 && v <= 100.0)
+          (arbitrary :: Gen Double) `suchThat` (\ v -> v > 0 && v <= 100.0)
 
 -- | generate a tuple having the same source & destination unit for conversion.
 genIdentityConv :: Gen (Value, From, To)
@@ -314,7 +320,7 @@ genIdentityConv = do
                     , (1, return 1.0)
                     , (2, (arbitrary :: Gen Double)
                             `suchThat`
-                            (\x -> x > 0 && x <= 100.0)
+                            (\ x -> x > 0 && x <= 100.0)
                       )
                     ]
   return (val, from, from)
@@ -327,7 +333,7 @@ genNonIdentityConv = do
                     , (1, return 1.0)
                     , (2, (arbitrary :: Gen Double)
                             `suchThat`
-                            (\x -> x > 0 && x <= 100.0)
+                            (\ x -> x > 0 && x <= 100.0)
                       )
                     ]
   to   <- (arbitrary :: Gen Unit) `suchThat` (/= from)
@@ -337,35 +343,38 @@ genNonIdentityConv = do
 -- | ******* QuickCheck properties -- internal functions & QC generators *******
 --------------------------------------------------------------------------------
 -- | test `genGoodFactors` generator.
+-- NOTE: `\ xs` instead of `\xs`, as `\ ` is a lambda function, so space after 
+-- `\` is recommended, just as a normal function call is written with space as 
+-- `f x`; see https://en.wikibooks.org/wiki/Haskell/More_on_functions
 prop_genGoodFactors :: Property
 prop_genGoodFactors = forAll genGoodFactors $
-  \xs -> let ok   = and $ map (\(_, f, _) -> f > 0) xs
-             us   = [ (u1, u2) | (u1, _, u2) <- xs ]
-             uniq = nub us == us
-         in ok && uniq
+  \ xs -> let ok   = and $ map (\ (_, f, _) -> f > 0) xs
+              us   = [ (u1, u2) | (u1, _, u2) <- xs ]
+              uniq = nub us == us
+          in ok && uniq
 
 -- | test `noDups` function.
 prop_noDups :: Property
 prop_noDups = forAll genGoodFactors $
-  \xs -> (noDups f g xs) && not (noDups f g (xs ++ xs))
+  \ xs -> (noDups f g xs) && not (noDups f g (xs ++ xs))
   where f :: (From, Factor, To) -> (From, Factor, To) -> Ordering
         -- compare :: Ord a => a -> a -> Ordering
         -- /u/ peargreen https://tinyurl.com/2p8p2j2e (reddit)
         -- haskell-notes--compare-tuple-list-using-mappend--peargreen.lhs
         -- list sorting, roman cheplyaka @ https://tinyurl.com/2s49u8kf
-        f = \(a, _, b) (c, _, d) -> if a /= c then compare a c else compare b d
+        f = \ (a, _, b) (c, _, d) -> if a /= c then compare a c else compare b d
         g :: (From, Factor, To) -> (From, Factor, To) -> Bool
         g = \(a, _, b) (c, _, d) -> not (a == c && b == d)
 
 -- | test `genIdentityConv` generator.
 prop_genIdentityConv :: Property
 prop_genIdentityConv = forAll genIdentityConv $
-  \(v, from, to) -> v >= 0.0 && from == to
+  \ (v, from, to) -> v >= 0.0 && from == to
 
 -- | test `genNonIdentityConv` generator.
 prop_genNonIdentityConv :: Property
 prop_genNonIdentityConv = forAll genNonIdentityConv $
-  \(v, from, to) -> v >= 0.0 && from /= to
+  \ (v, from, to) -> v >= 0.0 && from /= to
 
 --------------------------------------------------------------------------------
 -- | ************************ unit tests -- internal  **************************

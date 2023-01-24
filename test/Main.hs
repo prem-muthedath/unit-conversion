@@ -130,21 +130,21 @@ qcProps = testGroup "QuickCheck properties -- `unit-conversion` library"
 -- | test unit conversion for inputs having the same source & destination units.
 prop_identityConv :: Property
 prop_identityConv = forAll genIdentityConv $
-  \(v, x, y) -> convertUnit (v, x, y) == Just v
+  \ (v, x, y) -> convertUnit (v, x, y) == Just v
 
 -- | test unit conversion for inputs with different source & destination units.
 prop_convEquivalence :: Property
 prop_convEquivalence = forAll genNonIdentityConv $
-  \(val, from, to) -> let res1 = convertUnit (val, from, to)
-                          res2 = convertUnit (0.0, to, from)
-                          f :: Value -> Value -> Bool
-                          f x y = x /= y && y > 0 && abs (y - val) <= 0.0001
-                      in case res1 of
-                          Nothing  -> res2 == Nothing
-                          Just 0.0 -> res2 == Just 0.0
-                          Just x   -> case convertUnit (x, to, from) of
-                                        Nothing   -> False
-                                        Just y    -> f x y
+  \ (val, from, to) -> let res1 = convertUnit (val, from, to)
+                           res2 = convertUnit (0.0, to, from)
+                           f :: Value -> Value -> Bool
+                           f x y = x /= y && y > 0 && abs (y - val) <= 0.0001
+                       in case res1 of
+                            Nothing  -> res2 == Nothing
+                            Just 0.0 -> res2 == Just 0.0
+                            Just x   -> case convertUnit (x, to, from) of
+                                          Nothing   -> False
+                                          Just y    -> f x y
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
