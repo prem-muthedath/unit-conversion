@@ -2,7 +2,7 @@
 
 simple (linear & proportional) unit conversions.
 
-inspired by Jane Street python implementation of a similiar problem @ 
+inspired by Jane Street python implementation of a similiar problem @   
 https://www.youtube.com/watch?v=VfbFJISCP3g.
 
 author: Prem Muthedath
