@@ -1,10 +1,10 @@
 #### unit-conversion
-<sub>
+
 simple (linear & proportional) unit conversions.
-</sub>
-<sub>inspired by Jane Street python implementation of a similiar problem @   
+
+inspired by Jane Street python implementation of a similiar problem @ 
 https://www.youtube.com/watch?v=VfbFJISCP3g.
-</sub>
+
 author: Prem Muthedath
 
 scope:
