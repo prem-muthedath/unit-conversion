@@ -45,7 +45,7 @@ https://www.youtube.com/watch?v=VfbFJISCP3g.
      the below 2 commands:
 
      ````
-     cabal v2-repl -f testing :unit-conversion-test
-     main
+     1. cabal v2-repl -f testing :unit-conversion-test
+     2. main
      ````
 
