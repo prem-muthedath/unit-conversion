@@ -44,6 +44,8 @@ https://www.youtube.com/watch?v=VfbFJISCP3g.
      starting `GHCi` by loading the tests and then running those tests, using 
      the below 2 commands:
 
-        - `cabal v2-repl -f testing :unit-conversion-test`
-        - `main`
+     ````
+     cabal v2-repl -f testing :unit-conversion-test
+     main
+     ````
 
