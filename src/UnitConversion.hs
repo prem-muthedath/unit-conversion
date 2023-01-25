@@ -13,21 +13,21 @@ module UnitConversion
     Unit (..)
     -- | value to convert from one unit to another or a conversion result.
   , Value
-  -- | the  "from" `Unit` you want to convert from.
+    -- | the  "from" `Unit` you want to convert from.
   , From
-  -- | the "to" `Unit` you want to convert to.
+    -- | the "to" `Unit` you want to convert to.
   , To
-  -- | the conversion factor, a `Double`, that relates `From` & `To` units.
+    -- | the conversion factor, a `Double`, that relates `From` & `To` units.
   , Factor
-  -- | all available conversion factors in this package.
+    -- | all available conversion factors in this package.
   , factors
-  -- | converts a `Value` from `From` to `To`.
+    -- | converts a `Value` from `From` to `To`.
   , convertUnit
-  -- | same as `convertUnit` but also formats & prints result; for GHCi, mainly.
+    -- | `IO` version of `convertUnit` that formats & prints result.
   , convertUnitIO
-  -- | exposed only for testing internal functions.
+    -- | exposed only for testing internal functions.
 #ifdef TESTING
-  -- | graph of `factors`.
+    -- | graph of `factors`.
   , factorGraph
 #endif
   ) where
