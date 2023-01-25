@@ -194,7 +194,7 @@ graphKeyValueFactorRule' graph =
         f k kvs = [ g to kf ( M1.lookup to graph ) | (to, kf) <- kvs ]
           where g :: To -> Factor -> Maybe [(To, Factor)] -> Assertion
                 g _ _ Nothing     = error $ "bad test data for key: " ++ show k
-                g t kf (Just tvs) = case find (\ (x, _) -> x == k) tvs of
+                g t kf (Just tvs) = case find ((== k) . fst) tvs of
                   Nothing        -> error $ "bad test data for key: " ++ show k
                   Just (_, tf)   -> assertBool (msg kf t tf) $
                     abs (kf - (1.0/tf)) <= 0.0001
