@@ -5,9 +5,9 @@ simple (linear & proportional) unit conversions.
 inspired by Jane Street python implementation of a similiar problem @   
 https://www.youtube.com/watch?v=VfbFJISCP3g.
 
-author: Prem Muthedath
+##### author: Prem Muthedath
 
-scope:
+##### scope:
   - converts values from one unit to another.
   - conversions limited to units in direct linear proportional relationship: 
     meters-to-feet, pounds-to-grams, etc.
@@ -16,9 +16,9 @@ scope:
     celsius-to-fahrenheit conversion, or conversion of units related through 
     complex formulae or mathematical equations.
 
-GHC version: 8.10.4, cabal 3.40
+##### GHC version: 8.10.4, cabal 3.40
 
-how to use the library & run the tests:
+##### how to use the library & run the tests:
   1. `cd` to `unit-conversion`, the top directory containing this `README` file, 
      and remain there to execute any of the steps below.
   2. to load the `UnitConversion` library into `GHCi`, enter the below command 
