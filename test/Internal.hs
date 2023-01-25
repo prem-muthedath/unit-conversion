@@ -173,7 +173,7 @@ keysGraphValues' graph =
                 -- type ShowS = String -> String
                 -- NOTE: foldr (\ x acc -> x . acc) (showString "")
                 -- :: Foldable t => t (String -> String) -> String -> String
-                msg to = foldr (\ x acc -> x . acc) (showString "")
+                msg to = foldr (.) (showString "")
                     [ shows to
                     , showString " is a value of graph key `"
                     , shows k
@@ -205,7 +205,7 @@ graphKeyValueFactorRule' graph =
                 -- type ShowS = String -> String
                 -- NOTE: foldr (\ x acc -> x . acc) (showString "")
                 -- :: Foldable t => t (String -> String) -> String -> String
-                msg kf t tf = foldr (\ x acc -> x . acc) (showString "")
+                msg kf t tf = foldr (.) (showString "")
                           [ shows k
                           , showString " is a graph key related to "
                           , shows t
