@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 -- | internal module containing functions supporting tests as well as tests for 
 -- functions & generators used in tests.
@@ -14,7 +15,7 @@ import Test.Tasty.ExpectedFailure (expectFail)
 import Test.Tasty.HUnit (testCase, assertBool, assertFailure)
 import Test.HUnit (Assertion)
 import Test.Tasty.QuickCheck (testProperty)
-import Test.QuickCheck
+import Test.QuickCheck hiding (tolerance)
 
 import UnitConversion
 --------------------------------------------------------------------------------
@@ -193,11 +194,17 @@ graphKeyValueFactorRule' graph =
     let f :: From -> [(To, Factor)] -> [Assertion]
         f k kvs = [ g to kf ( M1.lookup to graph ) | (to, kf) <- kvs ]
           where g :: To -> Factor -> Maybe [(To, Factor)] -> Assertion
-                g _ _ Nothing     = error $ "bad test data for key: " ++ show k
-                g t kf (Just tvs) = case find ((== k) . fst) tvs of
-                  Nothing        -> error $ "bad test data for key: " ++ show k
-                  Just (_, tf)   -> assertBool (msg kf t tf) $
-                    abs (kf - (1.0/tf)) <= 0.0001
+                g t kf tvs = case g' of
+                    Just ass -> ass
+                    Nothing  -> error $ "bad test data for key: " ++ show k
+                    where g' :: Maybe Assertion
+                          g' = do
+                            tvs'    :: [(To, Factor)] <- tvs
+                            (_, tf) :: (To, Factor)   <- find ((== k) . fst) tvs'
+                            return $ assertBool (msg kf t tf) $
+                              abs (kf - (1.0/tf)) <= tolerance
+                          tolerance :: Double
+                          tolerance = 0.0001
                 msg :: Factor -> To -> Factor -> String
                 -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
                 -- shows :: Show a => a -> ShowS
