@@ -189,50 +189,50 @@ keysGraphValues' graph =
 -- | test if `k` is a key that has `(t, v)` has one of its values, then the 
 -- graph also has a key `t` with `(k, 1.0/v)` as one of its values.  this rule 
 -- should apply to every value of every key in the graph.
+-- Data.List.find :: Foldable t => (a -> Bool) -> t a -> Maybe a
 graphKeyValueFactorRule' :: M1.Map From [(To, Factor)] -> Assertion
 graphKeyValueFactorRule' graph =
-    let f :: From -> [(To, Factor)] -> [Assertion]
-        f k kvs = [ g to kf ( M1.lookup to graph ) | (to, kf) <- kvs ]
-          where g :: To -> Factor -> Maybe [(To, Factor)] -> Assertion
-                g t kf tvs = case g' of
-                    Just ass -> ass
-                    Nothing  -> error $ "bad test data for key: " ++ show k
-                    where g' :: Maybe Assertion
-                          g' = do
-                            tvs'    :: [(To, Factor)] <- tvs
-                            (_, tf) :: (To, Factor)   <- find ((== k) . fst) tvs'
-                            return $ assertBool (msg kf t tf) $
-                              abs (kf - (1.0/tf)) <= tolerance
-                          tolerance :: Double
-                          tolerance = 0.0001
-                msg :: Factor -> To -> Factor -> String
+  let chks :: [Assertion]
+      chks = do
+          (k, kvs) :: (From, [(To, Factor)]) <- M1.toList graph
+          (to, kf) :: (To, Factor)           <- kvs
+          let tvs  :: Maybe [(To, Factor)] = M1.lookup to graph
+          return $ f k to kf tvs
+      f :: From -> To -> Factor -> Maybe [(To, Factor)] -> Assertion
+      f k t kf tvs = case f' of
+          Just ass -> ass
+          Nothing  -> error $ "bad test data for key: " ++ show k
+          where f' :: Maybe Assertion
+                f' = do
+                  tvs'    :: [(To, Factor)] <- tvs
+                  (_, tf) :: (To, Factor)   <- find ((== k) . fst) tvs'
+                  return $ assertBool (msg tf) $ abs (kf - (1.0/tf)) <= 0.0001
+                msg :: Factor -> String
                 -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
                 -- shows :: Show a => a -> ShowS
                 -- showString :: String -> ShowS
                 -- type ShowS = String -> String
                 -- NOTE: foldr (\ x acc -> x . acc) (showString "")
                 -- :: Foldable t => t (String -> String) -> String -> String
-                msg kf t tf = foldr (.) (showString "")
-                          [ shows k
-                          , showString " is a graph key related to "
-                          , shows t
-                          , showString " by a factor "
-                          , shows kf
-                          , showString ", but "
-                          , shows t
-                          , showString " as a key is related to "
-                          , shows k
-                          , showString "\n through a 'possible' wrong factor "
-                          , shows tf
-                          , showString ", instead of the expected value "
-                          , showString "1.0/"
-                          , shows kf
-                          , showString " = "
-                          , shows (1.0/kf)
-                          ] $ []
-
-        chks = concat [ f k kvs | (k, kvs) <- M1.toList graph ]
-    in processAssertions chks
+                msg tf = foldr (.) (showString "")
+                    [ shows k
+                    , showString " is a graph key related to "
+                    , shows t
+                    , showString " by a factor "
+                    , shows kf
+                    , showString ", but "
+                    , shows t
+                    , showString " as a key is related to "
+                    , shows k
+                    , showString "\n through a 'possible' wrong factor "
+                    , shows tf
+                    , showString ", instead of the expected value "
+                    , showString "1.0/"
+                    , shows kf
+                    , showString " = "
+                    , shows (1.0/kf)
+                    ] $ []
+  in processAssertions chks
 
 -- | process `[Assertion]` and report the first `Assertion` if any.
 -- throws `assertFailure` if the supplied list is empty.
