@@ -15,7 +15,7 @@ import Test.Tasty.ExpectedFailure (expectFail)
 import Test.Tasty.HUnit (testCase, assertBool, assertFailure)
 import Test.HUnit (Assertion)
 import Test.Tasty.QuickCheck (testProperty)
-import Test.QuickCheck hiding (tolerance)
+import Test.QuickCheck
 
 import UnitConversion
 --------------------------------------------------------------------------------
