@@ -189,7 +189,6 @@ keysGraphValues' graph =
 -- | test if `k` is a key that has `(t, v)` has one of its values, then the 
 -- graph also has a key `t` with `(k, 1.0/v)` as one of its values.  this rule 
 -- should apply to every value of every key in the graph.
--- Data.List.find :: Foldable t => (a -> Bool) -> t a -> Maybe a
 graphKeyValueFactorRule' :: M1.Map From [(To, Factor)] -> Assertion
 graphKeyValueFactorRule' graph =
   let chks :: [Assertion]
@@ -205,6 +204,7 @@ graphKeyValueFactorRule' graph =
           where f' :: Maybe Assertion
                 f' = do
                   tvs'    :: [(To, Factor)] <- tvs
+                  -- find :: Foldable t => (a -> Bool) -> t a -> Maybe a
                   (_, tf) :: (To, Factor)   <- find ((== k) . fst) tvs'
                   return $ assertBool (msg tf) $ abs (kf - (1.0/tf)) <= 0.0001
                 msg :: Factor -> String
