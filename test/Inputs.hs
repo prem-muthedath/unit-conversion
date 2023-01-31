@@ -5,9 +5,9 @@ module Inputs where
 --------------------------------------------------------------------------------
 import UnitConversion (Value, From, To, Unit (..))
 --------------------------------------------------------------------------------
+-- | test cases.
 tcs :: [(Value, From, To)]
-tcs = [ -- test cases
-        (100.0, Meters, Meters)
+tcs = [ (100.0, Meters, Meters)
       , (25.0, Meters, Feet)
       , (34.5, Feet, Inches)
       , (4676.28, Inches, Feet)
@@ -31,14 +31,14 @@ tcs = [ -- test cases
       , (15.0, Kilograms, Meters)
       , (1000.0, Grams, Kilograms)
       , (14.0, Pounds, Stone)
-      , ((-15.8), Yards, Inches)
+      , (-15.8, Yards, Inches)
       , (0.0, Pounds, Stone)
       ]
 
 --------------------------------------------------------------------------------
+-- | expected output for test cases.
 exps :: [Maybe Value]
-exps = [ -- expected output
-         Just 100.0         -- M -> M
+exps = [ Just 100.0         -- M -> M
        , Just 82.021        -- F -> M
        , Just 414.0         -- F -> I
        , Just 389.69        -- I -> F

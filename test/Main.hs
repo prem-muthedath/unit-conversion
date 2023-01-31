@@ -10,6 +10,7 @@ import Test.Tasty.HUnit (testCase, assertBool)
 import Test.HUnit (Assertion)
 import Test.Tasty.QuickCheck (testProperty)
 import Test.QuickCheck
+import Data.Maybe (isNothing)
 
 import UnitConversion
 import Inputs (tcs, exps)
@@ -140,7 +141,7 @@ prop_convEquivalence = forAll genNonIdentityConv $
                            f :: Value -> Value -> Bool
                            f x y = x /= y && y > 0 && abs (y - val) <= 0.0001
                        in case res1 of
-                            Nothing  -> res2 == Nothing
+                            Nothing  -> isNothing res2
                             Just 0.0 -> res2 == Just 0.0
                             Just x   -> case convertUnit (x, to, from) of
                                           Nothing   -> False
