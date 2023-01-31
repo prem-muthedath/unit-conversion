@@ -79,7 +79,7 @@ genGoodGraph = M1.fromList $ [ genGoodGraph' u | u <- units ]
     where genGoodGraph' :: Unit -> (From, [(To, Factor)])
           genGoodGraph' x = let l   = length units - 1
                                 vs  = replicate l (1.0 :: Double)
-                            in (x, (zip  (filter (/= x) units) vs))
+                            in (x, zip (filter (/= x) units) vs)
 
 -- | test if given graph is non-empty.
 nonEmptyGraph' :: M1.Map From [(To, Factor)] -> Assertion
@@ -90,7 +90,7 @@ nonEmptyGraph' graph | M1.null graph = assertFailure "empty graph"
 noEmptyGraphValues' :: M1.Map From [(To, Factor)] -> Assertion
 noEmptyGraphValues' graph =
   let f :: From -> [To] -> Assertion
-      f k tos | tos == [] = assertFailure msg
+      f k tos | null tos  = assertFailure msg
               | otherwise = return ()
               where msg :: String
                     -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
@@ -166,7 +166,7 @@ keysGraphValues' graph =
         f k tos = [ g to ( M1.lookup to graph ) | to <- tos ]
           where g :: To -> Maybe [(To, Factor)] -> Assertion
                 g _ Nothing    = error $ "bad test data; for key " ++ show k
-                g to (Just vs) = assertBool (msg to) $ k `elem` (map fst vs)
+                g to (Just vs) = assertBool (msg to) $ k `elem` map fst vs
                 msg :: To -> String
                 -- foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
                 -- shows :: Show a => a -> ShowS
@@ -182,7 +182,7 @@ keysGraphValues' graph =
                     , shows k
                     , showString "` is missing as a value of the key: "
                     , shows to
-                    ] $ []
+                    ] []
         chks = concat [ f k (map fst vs) | (k, vs) <- M1.toList graph ]
     in processAssertions chks
 
@@ -231,7 +231,7 @@ graphKeyValueFactorRule' graph =
                     , shows kf
                     , showString " = "
                     , shows (1.0/kf)
-                    ] $ []
+                    ] []
   in processAssertions chks
 
 -- | process `[Assertion]` and report the first `Assertion` if any.
@@ -311,7 +311,7 @@ genGoodFactors = do
       vs <- f2 (length us)
       return $ zipWith (\ (a, b) c -> (a, c, b)) us vs
   where f1 :: Gen [(Unit, Unit)]
-        f1 = nub <$> (listOf1 $ do
+        f1 = nub <$> listOf1 (do
           x <- arbitrary :: Gen Unit
           y <- arbitrary :: Gen Unit
           return (x, y))
@@ -355,7 +355,7 @@ genNonIdentityConv = do
 -- `f x`; see https://en.wikibooks.org/wiki/Haskell/More_on_functions
 prop_genGoodFactors :: Property
 prop_genGoodFactors = forAll genGoodFactors $
-  \ xs -> let ok   = and $ map (\ (_, f, _) -> f > 0) xs
+  \ xs -> let ok   = all (\ (_, f, _) -> f > 0) xs
               us   = [ (u1, u2) | (u1, _, u2) <- xs ]
               uniq = nub us == us
           in ok && uniq
@@ -363,7 +363,7 @@ prop_genGoodFactors = forAll genGoodFactors $
 -- | test `noDups` function.
 prop_noDups :: Property
 prop_noDups = forAll genGoodFactors $
-  \ xs -> (noDups f g xs) && not (noDups f g (xs ++ xs))
+  \ xs -> noDups f g xs && not (noDups f g (xs ++ xs))
   where f :: (From, Factor, To) -> (From, Factor, To) -> Ordering
         -- compare :: Ord a => a -> a -> Ordering
         -- /u/ peargreen https://tinyurl.com/2p8p2j2e (reddit)
@@ -420,12 +420,12 @@ test_genGoodGraph :: Assertion
 test_genGoodGraph =
          let mp = genGoodGraph
              ks = M1.keys mp
-             ch = [ f k ((M1.!) mp k) | k <- ks, ks == units ]
-         in assertBool "bad test graph generator" $ (ch /= []) && (and ch)
+             ch = [ f k ((M1.!) mp k) | ks == units, k <- ks ]
+         in assertBool "bad test graph generator" $ (ch /= []) && and ch
     where f :: From -> [(To, Factor)] -> Bool
-          f k vs | nub vs /= vs = False
-                 | (map fst vs) /= filter (/= k) units = False
-                 | any (/= 1.0) (map snd vs) = False
+          f k vs | nub vs /= vs                      = False
+                 | map fst vs /= filter (/= k) units = False
+                 | any ((/= 1.0) . snd) vs           = False
                  | otherwise = True
 
 -- | test `nonEmptyFactors'`
@@ -440,7 +440,7 @@ test_allFactorsGT0' :: Assertion
 test_allFactorsGT0' = do allFactorsGT0' good  -- expected to pass
                          allFactorsGT0' bad   -- expected to fail
   where good = [(Meters, 1.0, Meters)]
-        bad  = [(Meters, (-1.0), Meters)]
+        bad  = [(Meters, -1.0, Meters)]
 
 -- | test `noDupFactors'`
 test_noDupFactors' :: Assertion
