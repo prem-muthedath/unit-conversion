@@ -74,7 +74,7 @@ factors = [ -- length factors
 --       known as the `to` units), we have to also specify the conversion 
 --       factors, defined by `factors`, for each node associated with the `key`.
 --    4. each associated node (the to` unit) and the conversion factor form a 
---       2-tuple, and all these 2-tuples asscoaited with a node (i.e., the key, 
+--       2-tuple, and all these 2-tuples associated with a node (i.e., the key, 
 --       the `from` unit) are in a list.
 --    5. so each key (i.e., the `from` unit) in the Map, the factor graph, maps 
 --       to a list of 2-tuples, & each 2-tuple has a node (the `to` unit) and 
